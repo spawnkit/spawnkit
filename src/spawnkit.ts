@@ -122,17 +122,22 @@ async function main() {
     const selectedChoice = choices.find((c) => c.preset === preset);
 
     if (!selectedChoice) {
-      console.log(chalk.red("Selected preset not found."));
+      console.log(chalk.red(modeText.presetMissing));
       process.exit(1);
     }
 
-    // Use the after array if it exists, otherwise fallback
-    const afterCommands = [
-      `cd ${finalProjectName}`,
-      selectedChoice.after?.length && selectedChoice.after,
-    ];
+    // Build command list
+    const afterCommands: string[] = [`cd ${finalProjectName}`];
+
+    if (
+      Array.isArray(selectedChoice.after) &&
+      selectedChoice.after.length > 0
+    ) {
+      afterCommands.push(...selectedChoice.after);
+    }
 
     console.log(chalk.green(`\n${modeText.done}`));
+
     for (const cmd of afterCommands) {
       console.log(chalk.cyan(`  ${cmd}`));
     }

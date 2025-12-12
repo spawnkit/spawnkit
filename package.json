@@ -2,7 +2,7 @@
   "name": "spawnkit",
   "author": "thelastofinusa",
   "description": "A CLI tool to scaffold web3 projects with ease.",
-  "version": "1.3.2",
+  "version": "1.3.4",
   "license": "MIT",
   "main": "./dist/spawnkit.js",
   "module": "./dist/spawnkit.mjs",

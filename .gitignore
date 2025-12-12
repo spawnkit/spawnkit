@@ -1,6 +1,5 @@
 /dist
 /node_modules
-/my-dapp
 
 .env
 .DS_Store

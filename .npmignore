@@ -1,6 +1,6 @@
 /src
 /node_modules
-/my-dapp
+/website
 
 .env
 .DS_Store
