@@ -32,13 +32,13 @@ export const Hero = () => {
 
           <div className="mx-auto max-w-md w-full">
             <div className="bg-background relative flex items-center gap-2 rounded-[calc(var(--radius)+0.5rem)] border pr-2 shadow shadow-zinc-950/5 has-[input:focus]:ring-2 has-[input:focus]:ring-muted">
-              <Logo className="pointer-events-none size-5 ml-4" />
+              <Logo className="pointer-events-none size-5 ml-4 stroke-primary" />
 
               <div className="h-12 flex items-center flex-1">
                 <p
                   className={[
                     "font-mono text-sm px-1 rounded",
-                    copied ? "bg-foreground text-background" : "",
+                    copied ? "bg-primary text-white" : "",
                   ].join(" ")}
                 >
                   {cmd}

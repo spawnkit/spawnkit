@@ -8,7 +8,7 @@ export const Features = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="border-border/40">
           <CardHeader>
-            <Palette className="h-10 w-10 text-cyan-500" />
+            <Palette className="h-10 w-10 text-primary" />
             <CardTitle className="mt-4">Pick your vibe</CardTitle>
             <CardDescription>
               Choose from default, genz, or shakespeare language styles for a
@@ -18,7 +18,7 @@ export const Features = () => {
         </Card>
         <Card className="border-border/40">
           <CardHeader>
-            <Terminal className="h-10 w-10 text-cyan-500" />
+            <Terminal className="h-10 w-10 text-primary" />
             <CardTitle className="mt-4">Curated templates</CardTitle>
             <CardDescription>
               Access pre-configured dApp starters from local JSON in dev and
@@ -28,7 +28,7 @@ export const Features = () => {
         </Card>
         <Card className="border-border/40">
           <CardHeader>
-            <FolderCheck className="h-10 w-10 text-cyan-500" />
+            <FolderCheck className="h-10 w-10 text-primary" />
             <CardTitle className="mt-4">Safe folder handling</CardTitle>
             <CardDescription>
               Override, rename, or cancel if target folder exists — no
@@ -38,7 +38,7 @@ export const Features = () => {
         </Card>
         <Card className="border-border/40">
           <CardHeader>
-            <PackageCheck className="h-10 w-10 text-cyan-500" />
+            <PackageCheck className="h-10 w-10 text-primary" />
             <CardTitle className="mt-4">Auto-install deps</CardTitle>
             <CardDescription>
               Automatically detects your package manager and installs

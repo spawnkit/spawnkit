@@ -21,8 +21,8 @@ export const Header = () => {
           <Button size="icon-sm" variant={"secondary"} className="md:hidden">
             <TbMenu className="size-4" />
           </Button>
-          <Link href="/" className="flex items-center gap-2">
-            <Logo className="size-6" />
+          <Link href="/" className="flex items-center gap-2 text-primary">
+            <Logo className="size-6 stroke-primary" />
             <p className="text-base font-bold font-mono">spawnkit</p>
           </Link>
 

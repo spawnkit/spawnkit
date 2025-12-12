@@ -10,7 +10,7 @@ export const Logo: React.FC<Props> = ({ className }) => {
     <svg
       fill="none"
       strokeWidth="2"
-      className={cn("size-50 stroke-foreground", className)}
+      className={cn("size-50", className)}
       viewBox="0 0 24 24"
       strokeLinecap="round"
       strokeLinejoin="round"
