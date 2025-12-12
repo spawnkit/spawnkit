@@ -1,108 +1,68 @@
 # spawnkit
 
-The easiest way to bootstrap dApps.
+Spawnkit is a friendly, zero-config CLI that scaffolds modern dApp starter projects from curated templates — then installs dependencies and prints the “what to do next” commands. Pick your vibe, pick a preset, name your app, and you’re ready to build.
 
-## Installation
+## Quick Start
 
-Global (recommended):
+- Use without installing:
+  ```sh
+  npx spawnkit@latest init
+  ```
+- Or install globally:
+  ```sh
+  npm install -g spawnkit@latest
+  spawnkit init
+  ```
 
-```sh
-npm install -g spawnkit@latest
-```
+## What It Does
 
-Or use without installation:
+- Prompts for a language style (“vibe”), a template preset, and a project folder name
+- Downloads the chosen template via `degit` and creates the folder
+- Detects your package manager automatically and installs dependencies
+- Prints helpful follow-up commands (e.g. `cd <your-app>`, `npm run dev`)
 
-```sh
-npx spawnkit@latest init
-```
+Main entrypoint: `src/spawnkit.ts`
 
-It is recommended to use the `@latest` version to ensure you have the latest features and bug fixes.
+## Key Features
 
-## Features
-
-- Interactive project creation
-- Three language **vibes**:
-
+- Interactive flow with three language styles:
   - `default`: clean & professional
-  - `genz`: unhinged & cooked
-  - `shakespeare`: thee & thou maxxing
+  - `genz`: playful slang responses
+  - `shakespeare`: old-timey theatrical prompts
+- Template presets from local JSON in development and from a remote source in production
+- Strong Zod validation for template metadata (title, preset, repo URL, optional after-commands)
+- Safe folder handling: override, rename, or cancel if the target already exists
+- Auto-installs using your detected package manager (`npm`, `pnpm`, `yarn`, `bun`)
 
-- Template presets loaded from:
-
-  - local `choices.json` _(dev mode)_
-  - remote API _(production mode)_
-
-- Strong Zod validation
-
-  - ensures template entries are correct
-  - enforces **GitHub** repo pattern
-
-- Auto project name validation
-
-- Handles existing folders (`override`, `rename`, `cancel`)
-
-- Auto-installs dependencies
-
-- Supports after commands per preset (`cd <project>`, `pnpm run dev`)
+Template loading logic: `src/lib/loadChoices.ts`
+Preset validation: `src/lib/choices.ts`
 
 ## Usage
-
-Run the CLI:
 
 ```sh
 spawnkit init
 ```
 
-You'll be prompted to choose:
+You’ll choose:
 
-1. Language style
+1. Language style (vibe)
 2. Project preset
 3. Project folder name
 
-Example:
+Example session:
 
-```code
+```text
 ✔ Pick your language style: Default - clean & professional
-✔ Choose your project setup: Next.js with Hardhat
+✔ Choose your project setup: Next.js Boilerplate
 ✔ Enter a name for your project folder: my-dapp
 ```
 
-## Validation Rules
+## Available Templates
 
-Each preset is validated via Zod:
+- Next.js Boilerplate — `src/choices.json`
+  - Repo: https://github.com/spawnkit/nextjs-boilerplate
 
-- `title`: required, non-empty
-
-- `preset`: required, non-empty
-
-- `repo`: must be a valid GitHub URL
-
-  - Example: `https://github.com/user/repo`
-
-- `after`: optional list of shell commands
-
-  - Presets can define custom after commands:
-
-  ```json
-  "after": [
-    "cd my-dapp",
-    "pnpm install",
-    "pnpm run dev"
-  ]
-  ```
-
-  - If omitted, `spawnkit` falls back to:
-
-  ```sh
-  cd my-dapp
-  ```
-
-Invalid entries will cause:
-
-```code
-Choices validation failed:
-Entry #1 invalid: repo: Repo must be a valid GitHub repository URL
-```
+You can add more templates by extending `src/choices.json` (for development) or by serving a compatible JSON schema remotely for production.
 
 ## Development
 
@@ -111,16 +71,8 @@ Entry #1 invalid: repo: Repo must be a valid GitHub repository URL
 - Watch build: `npm run watch:dev`
 - Run tests: `npm run test`
 
-## Environment
-
-- `src/lib/constants.ts` controls mode and remote presets:
-  - `NODE_ENV`: `"dev"` uses local `src/choices.json`; `"prod"` fetches remote.
-  - `CHOICES_API_URL`: remote JSON endpoint for presets in prod.
-
 ## Publishing
 
-- Build runs automatically before publish via `prepublishOnly`.
-- Use `npm run pubcli` to:
-  - auto-increment the patch version
-  - publish the package to npm
-- Dry-run pack without uploading: `npm publish --dry-run`
+- Build runs automatically before publish via `prepublishOnly`
+- Publish helper: `npm run pubcli` (bumps patch version and publishes)
+- Dry-run packing: `npm publish --dry-run`
