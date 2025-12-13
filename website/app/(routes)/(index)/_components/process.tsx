@@ -12,7 +12,7 @@ export const HowItWorks = () => {
           <p>From terminal to running project in under 60 seconds.</p>
         </div>
 
-        <div className="relative mx-auto grid divide-x divide-y border *:p-12 sm:grid-cols-2">
+        <div className="relative mx-auto grid divide-x divide-y border *:p-12 sm:grid-cols-2 md:grid-cols-4">
           {HOW_IT_WORKS.map((feature) => (
             <div key={feature.step} className="space-y-2">
               <div className="flex items-center gap-2">
