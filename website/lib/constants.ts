@@ -8,7 +8,6 @@ export const INIT_COMMAND = "npx spawnkit@latest init";
 export const GITHUB_API_URL = "https://api.github.com/repos";
 
 export const NAVIGATION_ROUTES = [
-  { href: "/docs", label: "Docs" },
   { href: "/community", label: "Community Kits" },
   { href: "/submit", label: "Submit a Kit" },
   { href: "https://github.com/spawnkit", label: "Github", icon: VscGithubAlt },
