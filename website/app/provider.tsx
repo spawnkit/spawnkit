@@ -1,4 +1,3 @@
-import { Footer } from "@/components/footer";
 import { Header } from "@/components/header";
 import { ThemeProvider } from "@/components/provider/theme.provider";
 
@@ -12,7 +11,6 @@ export default function Provider(props: { children: React.ReactNode }) {
     >
       <Header />
       {props.children}
-      <Footer />
     </ThemeProvider>
   );
 }

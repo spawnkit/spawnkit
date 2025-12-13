@@ -1,14 +1,16 @@
 import { cn } from "@/lib/utils";
-import { Albert_Sans, Geist_Mono } from "next/font/google";
+import { Fira_Mono, Fira_Sans } from "next/font/google";
 
-const geistSans = Albert_Sans({
+const geistSans = Fira_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = Fira_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const fontVariables = (className: string) =>

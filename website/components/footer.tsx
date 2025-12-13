@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 
 import { Wrapper } from "./wrapper";
-import { navRoutes } from "@/lib/constants";
+import { NAVIGATION_ROUTES } from "@/lib/constants";
 
 export const Footer = () => {
   return (
@@ -14,7 +14,7 @@ export const Footer = () => {
             <DateComponent />
           </React.Suspense>
           <div className="order-first flex flex-wrap justify-center gap-6 text-sm md:order-last">
-            {navRoutes.map((route, index) => (
+            {NAVIGATION_ROUTES.map((route, index) => (
               <Link
                 key={index}
                 href={{ pathname: route.href }}
