@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight } from "lucide-react";
@@ -14,38 +15,33 @@ export const Hero = () => {
         aria-hidden
         className="absolute inset-0 isolate hidden contain-strict lg:block"
       >
-        <div className="w-140 h-320 -translate-y-87.5 absolute left-0 top-0 -rotate-45 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,hsla(0,0%,85%,.08)_0,hsla(0,0%,55%,.02)_50%,hsla(0,0%,45%,0)_80%)]" />
-        <div className="h-320 absolute left-0 top-0 w-60 -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)] [translate:5%_-50%]" />
-        <div className="h-320 -translate-y-87.5 absolute left-0 top-0 w-60 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
+        <div className="absolute top-0 left-0 h-320 w-140 -translate-y-87.5 -rotate-45 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,hsla(0,0%,85%,.08)_0,hsla(0,0%,55%,.02)_50%,hsla(0,0%,45%,0)_80%)]" />
+        <div className="absolute top-0 left-0 h-320 w-60 [translate:5%_-50%] -rotate-45 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.06)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
+        <div className="absolute top-0 left-0 h-320 w-60 -translate-y-87.5 -rotate-45 bg-[radial-gradient(50%_50%_at_50%_50%,hsla(0,0%,85%,.04)_0,hsla(0,0%,45%,.02)_80%,transparent_100%)]" />
       </div>
       <section>
-        <div className="relative pt-24">
+        <div className="relative pt-12 md:pt-24">
           <div className="absolute inset-0 -z-10 size-full [background:radial-gradient(125%_125%_at_50%_100%,transparent_0%,var(--color-background)_75%)]"></div>
           <div className="mx-auto max-w-5xl px-6">
-            <div className="sm:mx-auto lg:mr-auto lg:mt-0">
-              <h1 className="mt-8 max-w-2xl text-balance text-5xl font-medium md:text-6xl lg:mt-16">
+            <div className="sm:mx-auto lg:mt-0 lg:mr-auto">
+              <h1 className="mt-8 max-w-2xl text-4xl font-medium text-balance sm:text-5xl md:text-6xl lg:mt-16">
                 Stop Googling{" "}
                 <span className="text-primary">Start Templating</span>
               </h1>
-              <p className="mt-8 max-w-lg text-pretty text-lg">
+              <p className="mt-8 max-w-lg text-lg text-pretty">
                 Spawn verified dApp templates instantly from your terminal. One
                 command. Zero setup friction.
               </p>
 
               <TerminalBlock
                 command={INIT_COMMAND}
-                className="max-w-md my-10"
+                className="my-10 max-w-md"
               />
 
               <div className="mt-12 flex items-center gap-2">
-                <div
-                  key={1}
-                  className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5"
-                >
-                  <Button asChild size="lg">
-                    <span className="text-nowrap">Get Started</span>
-                  </Button>
-                </div>
+                <Button asChild size="lg">
+                  <span className="text-nowrap">Get Started</span>
+                </Button>
                 <Link
                   href="/community"
                   className={buttonVariants({
@@ -59,17 +55,17 @@ export const Hero = () => {
             </div>
           </div>
 
-          <div className="mask-b-from-55% relative -mr-56 mt-8 overflow-hidden px-2 sm:mr-0 sm:mt-12 md:mt-20">
-            <div className="inset-shadow-2xs ring-background dark:inset-shadow-white/20 bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg shadow-zinc-950/15 ring-1">
+          <div className="relative mt-8 -mr-56 overflow-hidden mask-b-from-55% px-2 sm:mt-12 sm:mr-0 md:mt-20">
+            <div className="ring-background bg-background relative mx-auto max-w-6xl overflow-hidden rounded-2xl border p-4 shadow-lg ring-1 inset-shadow-2xs shadow-zinc-950/15 dark:inset-shadow-white/20">
               <Image
-                className="bg-background aspect-15/8 relative hidden rounded-2xl dark:block"
+                className="bg-background relative hidden aspect-15/8 rounded-2xl dark:block"
                 src="/mail2.png"
                 alt="app screen"
                 width="2700"
                 height="1440"
               />
               <Image
-                className="z-2 border-border/25 aspect-15/8 relative rounded-2xl border dark:hidden"
+                className="border-border/25 relative z-2 aspect-15/8 rounded-2xl border dark:hidden"
                 src="/mail2-light.png"
                 alt="app screen"
                 width="2700"
@@ -79,7 +75,7 @@ export const Hero = () => {
           </div>
         </div>
       </section>
-      <section className="bg-background pb-16 pt-16 md:pb-32">
+      <section className="bg-background pt-16 pb-16 md:pb-32">
         <Wrapper className="group relative">
           <div className="absolute inset-0 z-10 flex scale-95 items-center justify-center opacity-0 duration-500 group-hover:scale-100 group-hover:opacity-100">
             <Link
@@ -91,7 +87,7 @@ export const Hero = () => {
               <ChevronRight className="ml-1 inline-block size-3" />
             </Link>
           </div>
-          <div className="group-hover:blur-xs mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 sm:gap-x-16 sm:gap-y-14">
+          <div className="mx-auto mt-12 grid max-w-2xl grid-cols-4 gap-x-12 gap-y-8 transition-all duration-500 group-hover:opacity-50 group-hover:blur-xs sm:gap-x-16 sm:gap-y-14">
             <div className="flex">
               <img
                 className="mx-auto h-5 w-fit dark:invert"

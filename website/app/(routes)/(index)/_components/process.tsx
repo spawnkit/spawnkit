@@ -3,16 +3,16 @@ import { HOW_IT_WORKS } from "@/lib/constants";
 
 export const HowItWorks = () => {
   return (
-    <div className="py-16 md:py-32">
+    <div className="from-card/80 via-card/40 to-background bg-linear-to-b py-16 md:py-32">
       <Wrapper className="flex flex-col gap-12">
         <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center">
-          <h2 className="text-balance text-4xl font-medium lg:text-5xl">
+          <h2 className="text-4xl font-medium text-balance lg:text-5xl">
             How It Works
           </h2>
           <p>From terminal to running project in under 60 seconds.</p>
         </div>
 
-        <div className="relative mx-auto grid divide-x divide-y border *:p-12 md:*:p-8 sm:grid-cols-2 md:grid-cols-4">
+        <div className="relative mx-auto grid divide-x divide-y border *:p-12 sm:grid-cols-2 md:grid-cols-4 md:*:p-8">
           {HOW_IT_WORKS.map((feature) => (
             <div key={feature.step} className="space-y-2">
               <div className="flex items-center gap-2">

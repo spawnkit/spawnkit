@@ -4,7 +4,8 @@ import { MdOutlineStyle } from "react-icons/md";
 import { LuLayoutTemplate } from "react-icons/lu";
 import { BiRocket } from "react-icons/bi";
 
-export const INIT_COMMAND = "pnpm dlx spawnkit@latest init";
+export const INIT_COMMAND = "npx spawnkit@latest init";
+export const GITHUB_API_URL = "https://api.github.com/repos";
 
 export const NAVIGATION_ROUTES = [
   { href: "/docs", label: "Docs" },
