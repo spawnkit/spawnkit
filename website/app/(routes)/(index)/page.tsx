@@ -1,16 +1,16 @@
-import { CTA } from "./_components/cta";
-import { Hero } from "./_components/hero";
 import { HowItWorks } from "./_components/process";
+import { HeroComp } from "./_components/hero";
 import { WhySpawnkit } from "./_components/purpose";
-import { DeveloperExperienceFirst } from "./_components/experience";
+import { DeveloperExperience } from "./_components/experience";
+import { CTA } from "./_components/cta";
 
-export default function Home() {
+export default async function Home() {
   return (
-    <div className="overflow-x-clip flex-1">
-      <Hero />
+    <div className="flex-1 overflow-x-clip">
+      <HeroComp />
       <HowItWorks />
       <WhySpawnkit />
-      <DeveloperExperienceFirst />
+      <DeveloperExperience />
       <CTA />
     </div>
   );

@@ -11,7 +11,7 @@ Spawnkit is a friendly, zero-config CLI that scaffolds modern dApp starter proje
 - Or install globally:
   ```sh
   npm install -g spawnkit@latest
-  spawnkit init
+  spawn init
   ```
 
 ## What It Does

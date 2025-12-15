@@ -1,11 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import { Card, CardContent } from "@/ui/card";
-import { Layers, Users } from "lucide-react";
 import { Wrapper } from "@/components/wrapper";
+import { Icon } from "@/components/hugeicons";
 
 export const WhySpawnkit = () => {
   return (
-    <div className="py-16 md:py-32">
+    <div className="py-16 sm:py-24 md:py-32">
       <Wrapper className="flex flex-col gap-12">
         <div className="relative">
           <div className="relative z-10 grid grid-cols-6 gap-3">
@@ -180,7 +180,7 @@ export const WhySpawnkit = () => {
               <CardContent className="grid pt-6 sm:grid-cols-2">
                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
                   <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
-                    <Layers className="m-auto size-5" strokeWidth={1} />
+                    <Icon.LayerIcon className="m-auto size-5" strokeWidth={1} />
                   </div>
                   <div className="space-y-2">
                     <h2 className="group-hover:text-secondary-950 text-lg font-medium text-zinc-800 transition dark:text-white">
@@ -245,7 +245,7 @@ export const WhySpawnkit = () => {
               <CardContent className="grid h-full pt-6 sm:grid-cols-2">
                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
                   <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
-                    <Users className="m-auto size-6" strokeWidth={1} />
+                    <Icon.UserIcon className="m-auto size-6" strokeWidth={1} />
                   </div>
                   <div className="space-y-2">
                     <h2 className="text-lg font-medium transition">

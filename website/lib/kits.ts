@@ -1,6 +1,7 @@
 export interface Kit {
   id: string;
   name: string;
+  preset?: string;
   description: string;
   stack: string[];
   githubUrl: string;

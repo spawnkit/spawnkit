@@ -8,6 +8,7 @@ const wrapperVariants = cva("mx-auto w-full px-4", {
   variants: {
     size: {
       default: "max-w-[1200px]",
+      sm: "max-w-247.25",
     },
   },
   defaultVariants: {

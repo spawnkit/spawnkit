@@ -1,23 +1,29 @@
-import {
-  ExternalLink,
-  ArrowUp,
-  Check,
-  Github,
-  Star,
-  GitFork,
-  Calendar,
-} from "lucide-react";
-import { Button } from "@/ui/button";
-import { Badge } from "@/ui/badge";
-import { Kit } from "@/lib/kits-data";
-import { cn } from "@/lib/utils";
+"use client";
 
-interface KitCardProps {
+import { TbCopy, TbCopyCheckFilled, TbTerminal } from "react-icons/tb";
+
+import { Badge } from "@/ui/badge";
+import { Card } from "@/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
+import { Button, buttonVariants } from "@/ui/button";
+import { useCopyToClipboard } from "@/hooks/copyToClipboard";
+import { cn } from "@/lib/utils";
+import { Icon } from "./hugeicons";
+import { Kit } from "@/lib/kits";
+import Link from "next/link";
+
+interface Props {
   kit: Kit;
-  hasVoted: boolean;
-  isGitHubConnected: boolean;
-  onVote: (kitId: string) => void;
-  onConnectGitHub: () => void;
 }
 
 const statusStyles = {
@@ -26,136 +32,192 @@ const statusStyles = {
   rejected: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
-export function KitCard({
-  kit,
-  hasVoted,
-  isGitHubConnected,
-  onVote,
-  onConnectGitHub,
-}: KitCardProps) {
-  const handleVoteClick = () => {
-    if (!isGitHubConnected) {
-      onConnectGitHub();
-      return;
-    }
-    if (!hasVoted) {
-      onVote(kit.id);
-    }
-  };
+export const KitCard: React.FC<Props> = ({ kit }) => {
+  const { isCopied, copyToClipboard } = useCopyToClipboard();
 
   return (
-    <div className="group border-border bg-card/50 hover:border-primary/50 hover:bg-card hover:glow-primary relative rounded-lg border p-6 backdrop-blur-sm transition-all duration-300">
-      {/* Status Badge - Absolute positioned */}
-      <Badge
-        variant="outline"
-        className={cn(
-          "absolute top-4 right-4 text-xs capitalize",
-          statusStyles[kit.status],
-        )}
-      >
-        {kit.status}
-      </Badge>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Card className="bg-card/50 hover:border-primary/50 hover:bg-card hover:glow-primary relative cursor-pointer gap-4 p-4 backdrop-blur-sm transition-all duration-300">
+          <div className="flex items-center gap-3">
+            <Avatar className="size-11 border">
+              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage
+                src={kit.ownerAvatar ?? "https://github.com/ghost.png"}
+              />
+            </Avatar>
 
-      {/* Header with Owner */}
-      <div className="mb-4 flex items-center gap-2">
-        {kit.ownerAvatar && (
-          <img
-            src={kit.ownerAvatar}
-            alt={kit.owner}
-            className="border-border h-10 w-10 rounded-full border"
-          />
-        )}
-        <div className="min-w-0 flex-1">
-          <h3 className="text-foreground truncate pr-20 text-base font-medium">
-            {kit.name}
-          </h3>
-          {kit.owner && (
-            <span className="text-muted-foreground -mt-3 text-sm">
-              by {kit.owner}
-            </span>
-          )}
-        </div>
-      </div>
+            <div className="flex flex-1 flex-col">
+              <p className="line-clamp-1 text-sm font-medium">{kit.name}</p>
+              {kit.owner && (
+                <span className="text-muted-foreground text-xs font-normal">
+                  by {kit.owner}
+                </span>
+              )}
+            </div>
 
-      {/* Description */}
-      <p className="text-muted-foreground mb-4 line-clamp-2 text-sm leading-relaxed">
-        {kit.description}
-      </p>
-
-      {/* GitHub Stats */}
-      <div className="mb-4 flex items-center gap-4 text-sm">
-        {kit.stars !== undefined && (
-          <div className="text-muted-foreground flex items-center gap-1.5">
-            <Star className="text-chart-4 h-4 w-4" />
-            <span className="font-medium">{kit.stars.toLocaleString()}</span>
+            <Badge
+              variant={"secondary"}
+              className={cn(statusStyles[kit.status])}
+            >
+              {kit.status}
+            </Badge>
           </div>
-        )}
-        {kit.forks !== undefined && (
-          <div className="text-muted-foreground flex items-center gap-1.5">
-            <GitFork className="h-4 w-4" />
-            <span>{kit.forks.toLocaleString()}</span>
+
+          <pre className="text-muted-foreground rounded-lg font-sans text-sm leading-relaxed whitespace-pre-wrap">
+            {kit.description}
+          </pre>
+
+          {/* Tech Stack */}
+          <div className="flex flex-wrap gap-2">
+            {kit.stack.map((stack) => (
+              <span
+                key={stack}
+                className="bg-secondary text-secondary-foreground border-border/50 rounded-full border px-3 py-1 text-xs font-medium"
+              >
+                {stack}
+              </span>
+            ))}
           </div>
-        )}
-        {kit.language && (
-          <div className="flex items-center gap-1.5">
-            <span className="bg-primary h-3 w-3 rounded-full" />
-            <span className="text-muted-foreground">{kit.language}</span>
+
+          <div className="border-t pt-4">
+            <Button size={"sm"} variant={"outline"}>
+              <span>35</span>
+              <span>Upvote</span>
+            </Button>
           </div>
-        )}
-      </div>
+        </Card>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <Avatar className="size-11 border">
+              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage
+                src={kit.ownerAvatar ?? "https://github.com/ghost.png"}
+              />
+            </Avatar>
 
-      {/* Tech Stack */}
-      <div className="mb-5 flex flex-wrap gap-2">
-        {kit.stack.map((tech) => (
-          <span
-            key={tech}
-            className="bg-secondary text-secondary-foreground border-border rounded border px-2.5 py-1 font-mono text-xs"
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
+            <div className="flex flex-1 flex-col gap-px">
+              <DialogTitle className="line-clamp-1 text-sm font-medium">
+                {kit.name}
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-xs font-normal">
+                by {kit.owner}
+              </DialogDescription>
+            </div>
 
-      {/* Footer */}
-      <div className="border-border flex items-center justify-between border-t pt-4">
-        <div className="flex items-center gap-3">
-          <Button
-            variant={hasVoted ? "default" : "outline"}
-            size="sm"
-            onClick={handleVoteClick}
-            disabled={hasVoted}
-            className={cn(
-              "min-w-[80px] gap-2 font-mono",
-              hasVoted && "opacity-70",
-            )}
-            title={!isGitHubConnected ? "Connect GitHub to vote" : undefined}
-          >
-            {hasVoted ? (
-              <Check className="h-4 w-4" />
-            ) : !isGitHubConnected ? (
-              <Github className="h-4 w-4" />
-            ) : (
-              <ArrowUp className="h-4 w-4" />
-            )}
-            {kit.votes}
-          </Button>
+            <Badge
+              variant={"secondary"}
+              className={cn(statusStyles[kit.status])}
+            >
+              {kit.status}
+            </Badge>
+          </div>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <pre className="text-foreground bg-background dark:bg-card rounded-lg p-4 font-sans text-sm leading-relaxed whitespace-pre-wrap">
+            {kit.description}
+          </pre>
 
-          <a
-            href={kit.githubUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-primary flex items-center gap-1.5 text-sm transition-colors"
-          >
-            <ExternalLink className="h-4 w-4" />
-            View Repo
-          </a>
+          <div className="flex flex-col gap-2">
+            <p className="font-serif text-[11px] font-normal uppercase sm:text-xs">
+              Tech Stacks
+            </p>
+
+            <div className="flex flex-wrap gap-2">
+              {kit.stack.map((stack) => (
+                <span
+                  key={stack}
+                  className="bg-secondary text-secondary-foreground border-border/50 rounded-full border px-3 py-1 text-xs font-medium"
+                >
+                  {stack}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <pre className="bg-background dark:bg-card flex items-center gap-2 rounded-lg p-4 font-sans text-sm leading-relaxed font-medium whitespace-pre-wrap">
+              {kit.stars !== undefined && (
+                <div className="flex items-center gap-1.5">
+                  <Icon.StarIcon className="size-4" />
+                  <span className="font-serif text-xs">
+                    {kit.stars?.toLocaleString()} Stars
+                  </span>
+                </div>
+              )}
+              {kit.forks !== undefined && (
+                <div className="flex items-center gap-1.5">
+                  <Icon.GitForkIcon className="size-4" />
+                  <span className="font-serif text-xs">
+                    {kit.stars?.toLocaleString()} Fork
+                  </span>
+                </div>
+              )}
+              {/* {kit.language && (
+                <div className="flex items-center gap-1.5">
+                  <span className="bg-primary h-3 w-3 rounded-full" />
+                  <span className="text-muted-foreground">{kit.language}</span>
+                </div>
+              )} */}
+              <div className="ml-auto flex items-center gap-1.5">
+                <Icon.ArrowUp02Icon className="size-4" />
+                <span className="font-serif text-xs">10 Votes</span>
+              </div>
+            </pre>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <p className="font-serif text-[11px] font-normal uppercase sm:text-xs">
+              Quick Installation
+            </p>
+
+            <pre className="bg-background dark:bg-card flex items-center gap-2 rounded-lg px-4 py-2.5 font-sans text-sm leading-relaxed font-medium whitespace-pre-wrap">
+              <TbTerminal className="text-primary size-4.5" />
+              <span
+                className={cn(
+                  "line-clamp-1 px-1",
+                  isCopied && "bg-primary text-background",
+                )}
+              >
+                npx spawnkit nextjs-starter
+              </span>
+
+              <Button
+                size="icon-sm"
+                variant={"ghost"}
+                onClick={async () =>
+                  await copyToClipboard("npx spawnkit nextjs-starter")
+                }
+                aria-label="Copy command"
+                className="-mr-1 ml-auto"
+              >
+                {isCopied ? (
+                  <TbCopyCheckFilled className="text-primary size-4" />
+                ) : (
+                  <TbCopy className="size-4" />
+                )}
+              </Button>
+            </pre>
+          </div>
         </div>
-
-        <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
-          <Calendar className="h-3.5 w-3.5" />
-          {kit.submittedAt}
-        </div>
-      </div>
-    </div>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Link
+              target="_blank"
+              href={{ pathname: kit.githubUrl }}
+              className={buttonVariants({
+                className: "mx-auto h-12 w-[90%] rounded-full!",
+                size: "lg",
+              })}
+            >
+              <Icon.GithubIcon />
+              <span>View Repository</span>
+            </Link>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
-}
+};

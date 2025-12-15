@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
   experimental: {
     typedEnv: true,
   },
+  images: {
+    qualities: [100, 75],
+  },
 };
 
 export default nextConfig;

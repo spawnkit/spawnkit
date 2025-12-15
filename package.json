@@ -2,7 +2,7 @@
   "name": "spawnkit",
   "author": "thelastofinusa",
   "description": "A CLI tool to scaffold web3 projects with ease.",
-  "version": "1.3.4",
+  "version": "1.3.9",
   "license": "MIT",
   "main": "./dist/spawnkit.js",
   "module": "./dist/spawnkit.mjs",
@@ -14,9 +14,12 @@
     "build": "tsup",
     "test": "vitest run",
     "dev": "tsx src/spawnkit.ts",
-    "watch:dev": "tsup --watch",
     "prepublishOnly": "npm run build",
-    "pubcli": "npm version patch --no-git-tag-version && npm publish"
+    "pubcli": "npm version patch --no-git-tag-version && npm publish",
+    "spawnkit": "npm run dev",
+    "spawnkit-init": "pnpm run spawnkit -- init",
+    "spawnkit-nextjs-shadcn": "pnpm run spawnkit -- nextjs-shadcn",
+    "spawnkit-init-nextjs-shadcn": "pnpm run spawnkit -- init nextjs-shadcn"
   },
   "homepage": "https://spawndapp.vercel.app",
   "bugs": {

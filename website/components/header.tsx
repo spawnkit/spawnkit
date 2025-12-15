@@ -1,86 +1,76 @@
 "use client";
 
 import Link from "next/link";
-import { TbMenu } from "react-icons/tb";
+import * as React from "react";
 import { usePathname } from "next/navigation";
 
-import { Logo } from "./logo";
 import { Wrapper } from "./wrapper";
-import { cn, isActivePath } from "@/lib/utils";
-import { NAVIGATION_ROUTES } from "@/lib/constants";
+import { LogoComp } from "./logo";
 import { ModeSwitcher } from "./mode-switcher";
+import { NAVIGATION_ROUTES } from "@/constants";
 import { Button, buttonVariants } from "@/ui/button";
+import { cn, isActivePath } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
+import { Icon } from "./hugeicons";
+import { Separator } from "@/ui/separator";
 import {
-  connectGitHub,
-  disconnectGitHub,
-  GitHubUser,
-} from "@/lib/auth/github.auth";
-import { GITHUB_USERNAME } from "@/lib/api/github.api";
-import { toast } from "sonner";
-import React from "react";
-import { LogOut } from "lucide-react";
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/ui/sheet";
 
 export const Header = () => {
   const pathname = usePathname();
 
-  const [githubConnected, setGithubConnected] = React.useState(false);
-  const [githubUser, setGithubUser] = React.useState<GitHubUser | null>(null);
+  const [authenticated, setAuthenticated] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [isSmall, setIsSmall] = React.useState(false);
 
-  const handleConnectGitHub = () => {
-    const user = connectGitHub(GITHUB_USERNAME);
-    setGithubConnected(true);
-    setGithubUser(user);
-    toast.success("GitHub Connected!", {
-      description: "You can now vote on community kits.",
-    });
-  };
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-  const handleDisconnectGitHub = () => {
-    disconnectGitHub();
-    setGithubConnected(false);
-    setGithubUser(null);
-    toast.success("GitHub Disconnected", {
-      description: "Connect again to vote on kits.",
-    });
-  };
+  React.useEffect(() => {
+    function onScroll() {
+      setIsSmall(window.scrollY > 700);
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   return (
-    <header className="sticky top-0 left-0 z-50 w-full backdrop-blur-md">
-      <nav className="h-20 w-full md:h-24">
-        <Wrapper className="flex size-full items-center gap-2">
-          <Button size="icon-sm" variant={"secondary"} className="md:hidden">
-            <TbMenu className="size-4" />
-          </Button>
-          <Link
-            href="/"
-            className={cn(
-              "text-foreground flex items-center gap-2",
-              isActivePath(pathname, "/") && "text-primary",
-            )}
-          >
-            <Logo
-              className={cn(
-                "stroke-foreground size-6",
-                isActivePath(pathname, "/") && "stroke-primary",
-              )}
-            />
-            <p className="font-mono text-base font-medium">spawnkit</p>
-          </Link>
-
-          <div className="ml-2 flex flex-1 items-center justify-end gap-2">
-            <ul className="hidden flex-1 items-center gap-2 sm:flex">
+    <header className="bg-background dark:bg-background/80 sticky top-0 left-0 z-50 backdrop-blur-lg sm:dark:bg-transparent sm:dark:backdrop-blur-none">
+      <nav className="flex h-18 w-full items-center md:h-20">
+        <Wrapper
+          size={isSmall ? "sm" : "default"}
+          className="flex items-center gap-3 transition-all duration-500 ease-out sm:gap-4"
+        >
+          <LogoComp className="rounded-[8px] backdrop-blur-lg" />
+          <div className="flex flex-1 items-center justify-end gap-2">
+            <div className="md:bg-card/60 hidden flex-1 items-center gap-1 rounded-full sm:flex md:p-2 md:backdrop-blur-lg">
               {NAVIGATION_ROUTES.map((route) => {
-                const isActive = isActivePath(pathname, route.href);
+                const isActive = isActivePath(pathname, route.path);
 
                 return (
                   <Link
-                    key={route.href}
-                    href={{ pathname: route.href }}
-                    target={route.href.startsWith("http") ? "_blank" : "_self"}
+                    key={route.path}
+                    href={{ pathname: route.path }}
+                    target={
+                      route.path.startsWith("https://") ? "_blank" : "_self"
+                    }
                     className={buttonVariants({
                       size: "sm",
                       variant: isActive ? "secondary" : "ghost",
-                      className: "last-of-type:ml-auto",
+                      className: "last-of-type:ml-auto md:rounded-full!",
                     })}
                   >
                     {route.icon && <route.icon className="size-4" />}
@@ -88,34 +78,74 @@ export const Header = () => {
                   </Link>
                 );
               })}
-            </ul>
+            </div>
 
-            <ModeSwitcher />
+            {isMounted && (
+              <React.Fragment>
+                <ModeSwitcher />
 
-            {githubConnected ? (
-              <Button
-                variant="outline"
-                className="gap-2"
-                size="sm"
-                onClick={handleDisconnectGitHub}
-              >
-                <img
-                  src={githubUser?.avatarUrl}
-                  alt=""
-                  className="border-border h-5 w-5 rounded-full border"
+                {authenticated ? (
+                  <Avatar
+                    onClick={() => setAuthenticated(!authenticated)}
+                    className="cursor-pointer border"
+                  >
+                    <AvatarFallback>AS</AvatarFallback>
+                    <AvatarImage src="https://github.com/ghost.png" />
+                  </Avatar>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant={"outline"}
+                    onClick={() => setAuthenticated(!authenticated)}
+                    className="backdrop-blur-lg"
+                  >
+                    Sign In
+                  </Button>
+                )}
+
+                <Separator
+                  orientation="vertical"
+                  className="mx-2 h-4! sm:hidden"
                 />
-                {githubUser?.username}
-                <LogOut className="ml-1 h-3 w-3 opacity-50" />
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                className="gap-2"
-                size="sm"
-                onClick={handleConnectGitHub}
-              >
-                Sign In
-              </Button>
+
+                <Sheet>
+                  <SheetTrigger asChild className="sm:hidden">
+                    <Button size="icon-sm" variant={"secondary"}>
+                      <Icon.Menu09Icon />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent>
+                    <SheetHeader>
+                      <SheetTitle className="font-serif text-xs font-normal uppercase">
+                        Navigation Menu
+                      </SheetTitle>
+                      <SheetDescription />
+                    </SheetHeader>
+                    <div className="grid flex-1 auto-rows-min px-4">
+                      {NAVIGATION_ROUTES.map((route) => {
+                        return (
+                          <SheetClose key={route.path} asChild>
+                            <Link
+                              href={{ pathname: route.path }}
+                              target={
+                                route.path.startsWith("https://")
+                                  ? "_blank"
+                                  : "_self"
+                              }
+                              className={cn(
+                                "inline-flex items-center gap-x-2.5 border-b p-3 last-of-type:mt-auto last-of-type:border-b-0",
+                              )}
+                            >
+                              {route.icon && <route.icon className="size-4" />}
+                              <span>{route.label}</span>
+                            </Link>
+                          </SheetClose>
+                        );
+                      })}
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </React.Fragment>
             )}
           </div>
         </Wrapper>

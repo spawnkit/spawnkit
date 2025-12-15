@@ -1,18 +1,22 @@
-import { Toaster, ToasterProps } from "sonner";
-import { Footer } from "@/components/footer";
+"use client";
+import NextJSTopLoader from "nextjs-toploader";
+
+import { Toaster } from "@/ui/sonner";
 import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/components/provider/theme.provider";
 
 export default function Provider(props: { children: React.ReactNode }) {
   return (
     <ThemeProvider
       attribute="class"
-      defaultTheme="system"
+      defaultTheme="dark"
       enableSystem
       disableTransitionOnChange
     >
       <Header />
-      <Toaster richColors theme={"dark" as ToasterProps["theme"]} />
+      <Toaster richColors theme={"dark"} />
+      <NextJSTopLoader color="var(--primary)" showSpinner={false} />
       <main className="flex-1">{props.children}</main>
       <Footer />
     </ThemeProvider>

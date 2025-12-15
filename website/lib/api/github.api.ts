@@ -1,4 +1,4 @@
-export const GITHUB_USERNAME = "ethers-io";
+const GITHUB_USERNAME = "github";
 
 export interface GitHubRepo {
   id: number;

@@ -1,30 +1,54 @@
+import Image from "next/image";
 import { Wrapper } from "@/components/wrapper";
-import { HOW_IT_WORKS } from "@/lib/constants";
+import { FEATURES } from "@/constants";
 
 export const HowItWorks = () => {
   return (
-    <div className="from-card/80 via-card/40 to-background bg-linear-to-b py-16 md:py-32">
-      <Wrapper className="flex flex-col gap-12">
-        <div className="relative z-10 mx-auto max-w-xl space-y-4 text-center">
-          <h2 className="text-4xl font-medium text-balance lg:text-5xl">
-            How It Works
+    <div className="from-card/50 via-card/20 to-background bg-linear-to-b py-16 sm:py-24 md:py-32">
+      <Wrapper size="sm" className="space-y-4 sm:space-y-8 md:space-y-12">
+        <div className="relative z-10 grid items-center gap-4 md:grid-cols-2 md:gap-12">
+          <h2 className="max-w-sm font-mono text-2xl font-semibold capitalize sm:text-3xl md:max-w-max md:text-4xl md:leading-12">
+            The Lyra ecosystem brings together our models
           </h2>
-          <p>From terminal to running project in under 60 seconds.</p>
+          <p className="max-w-sm text-base sm:ml-auto">
+            Empower your team with workflows that adapt to your needs, whether
+            you prefer git synchronization or a AI Agents interface.
+          </p>
         </div>
-
-        <div className="relative mx-auto grid divide-x divide-y border *:p-12 sm:grid-cols-2 md:grid-cols-4 md:*:p-8">
-          {HOW_IT_WORKS.map((feature) => (
-            <div key={feature.step} className="space-y-2">
-              <div className="flex items-center gap-2">
-                <feature.icon className="size-4" />
-                <h3 className="text-sm font-medium">{feature.title}</h3>
-              </div>
-              <p className="text-muted-foreground text-sm">
-                {feature.description}
-              </p>
+        <div className="px-3 pt-3 md:-mx-8 lg:-mx-10">
+          <div className="relative aspect-88/36 mask-b-from-75% mask-b-to-95%">
+            <div className="ring-background bg-background relative overflow-hidden rounded-2xl border p-4 shadow-lg ring-1 inset-shadow-2xs shadow-zinc-950/15 sm:rounded-3xl md:rounded-4xl dark:inset-shadow-white/20">
+              <Image
+                src="/dark.png"
+                className="bg-background relative hidden rounded-lg sm:rounded-xl md:rounded-2xl dark:block"
+                alt="payments illustration dark"
+                width={2797}
+                height={1137}
+              />
+              <Image
+                src="/light.png"
+                className="border-border/25 relative z-2 rounded-lg border sm:rounded-xl md:rounded-2xl dark:hidden"
+                alt="payments illustration light"
+                width={2797}
+                height={1137}
+              />
             </div>
-          ))}
+          </div>
         </div>
+      </Wrapper>
+
+      <Wrapper className="relative mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-8 lg:grid-cols-4">
+        {FEATURES.map((feature, idx) => (
+          <div key={idx} className="space-y-3">
+            <div className="flex items-center gap-2">
+              <feature.icon className="size-4" />
+              <h3 className="text-sm font-medium">{feature.title}</h3>
+            </div>
+            <p className="text-muted-foreground text-sm">
+              {feature.description}
+            </p>
+          </div>
+        ))}
       </Wrapper>
     </div>
   );
