@@ -3,6 +3,7 @@
 import { z } from "zod";
 import * as React from "react";
 import { toast } from "sonner";
+import { Icons } from "hugeicons-proxy";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,10 +30,9 @@ import { AFTER_COMMANDS } from "@/constants";
 import { generatePreset, sleep } from "@/lib/utils";
 import { RepoValidation } from "@/lib/api/github.api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
-import { Icon } from "@/components/hugeicons";
-import { TbCopy } from "react-icons/tb";
 import { RepoSelector } from "./repo-selector";
 import { addKit } from "@/lib/kits";
+import { authClient } from "@/lib/auth-client";
 
 const kitSchema = z.object({
   name: z
@@ -47,7 +47,7 @@ const kitSchema = z.object({
   githubUrl: z
     .string("Repo URL is required")
     .refine((url) => url.includes("github.com"), "Must be a GitHub URL"),
-  after: z.array(z.string()).min(1, "Add at least one command"),
+  after: z.array(z.string()).optional(),
   description: z
     .string()
     .min(20, "Description must be at least 20 characters")
@@ -60,11 +60,7 @@ type KitFormData = z.infer<typeof kitSchema>;
 export const SubmitForm = () => {
   const router = useRouter();
 
-  const [stack, setStack] = React.useState<string[]>([
-    "typescript",
-    "wagmi",
-    "nextjs",
-  ]);
+  const [stack, setStack] = React.useState<string[]>([]);
   const [stackInput, setStackInput] = React.useState("");
   const [afterCommands, setAfterCommands] =
     React.useState<string[]>(AFTER_COMMANDS);
@@ -72,15 +68,21 @@ export const SubmitForm = () => {
   const [repoValidation, setRepoValidation] =
     React.useState<RepoValidation | null>(null);
 
+  const { data: session } = authClient.useSession();
+  const isAuthenticated = !!session;
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => setMounted(true), []);
+
   const form = useForm<KitFormData>({
     resolver: zodResolver(kitSchema),
     defaultValues: {
-      name: "Next.js + Wagmi Starter",
-      preset: "nextjs-wagmi-starter",
-      githubUrl: "https://github.com/github/copilot-cli",
+      name: "",
+      preset: "",
+      githubUrl: "",
       after: AFTER_COMMANDS,
-      description: "This is a test description for some reason",
-      stack: ["typescript", "wagmi", "nextjs"],
+      description: "",
+      stack: [],
     },
   });
 
@@ -90,6 +92,9 @@ export const SubmitForm = () => {
     formState: { errors, isSubmitting },
   } = form;
 
+  const isDisabled = !mounted ? true : isSubmitting || !isAuthenticated;
+
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchTitle = form.watch("name");
 
   React.useEffect(() => {
@@ -142,6 +147,7 @@ export const SubmitForm = () => {
   };
 
   const handleRemoveCommand = (cmdToRemove: string) => {
+    if (isDisabled) return;
     const newCommands = afterCommands.filter((cmd) => cmd !== cmdToRemove);
     setAfterCommands(newCommands);
     form.setValue("after", newCommands);
@@ -156,6 +162,10 @@ export const SubmitForm = () => {
   };
 
   async function onSubmit(values: KitFormData) {
+    if (!isAuthenticated) {
+      toast.error("Connect your GitHub account to submit a kit.");
+      return;
+    }
     if (!repoValidation || !repoValidation.exists || repoValidation.isPrivate) {
       form.setError("githubUrl", {
         message:
@@ -191,15 +201,16 @@ export const SubmitForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-serif text-xs uppercase">
-                    Template Name
+                    <span>Template Name</span>
+                    <span className="text-destructive -mt-2 -ml-1">*</span>
                   </FormLabel>
                   <FormControl>
-                    <InputGroup className="overflow-hidden rounded-xl md:h-12 md:px-1">
+                    <InputGroup className="overflow-hidden rounded-xl md:h-12 md:pr-0.5">
                       <InputGroupAddon>
-                        <Icon.DocumentValidationIcon className="h-4 w-4" />
+                        <Icons.DocumentCodeIcon className="h-4 w-4" />
                       </InputGroupAddon>
                       <InputGroupInput
-                        disabled={isSubmitting}
+                        disabled={isDisabled}
                         placeholder="e.g., Next.js + Wagmi Starter"
                         {...field}
                       />
@@ -216,10 +227,11 @@ export const SubmitForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-serif text-xs uppercase">
-                    Preset Slug
+                    <span>Preset Slug</span>
+                    <span className="text-destructive -mt-2 -ml-1">*</span>
                   </FormLabel>
                   <FormControl>
-                    <InputGroup className="overflow-hidden rounded-xl md:h-12 md:px-1">
+                    <InputGroup className="overflow-hidden rounded-xl md:h-12 md:pr-0.5">
                       <InputGroupAddon>
                         <span className="text-muted-foreground font-serif text-xs">
                           npx spawnkit
@@ -228,18 +240,9 @@ export const SubmitForm = () => {
                       <InputGroupInput
                         placeholder="nextjs-wagmi-starter"
                         className="font-serif text-xs!"
-                        disabled={isSubmitting}
+                        disabled={isDisabled}
                         {...field}
                       />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupButton
-                          size="sm"
-                          disabled
-                          className="disabled:opacity-100"
-                        >
-                          <TbCopy />
-                        </InputGroupButton>
-                      </InputGroupAddon>
                     </InputGroup>
                   </FormControl>
                   <FormDescription>
@@ -256,7 +259,8 @@ export const SubmitForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-serif text-xs uppercase">
-                    GitHub Repository URL
+                    <span>GitHub Repository URL</span>
+                    <span className="text-destructive -mt-2 -ml-1">*</span>
                   </FormLabel>
                   <FormControl>
                     <RepoSelector
@@ -264,7 +268,7 @@ export const SubmitForm = () => {
                       onChange={field.onChange}
                       onValidation={handleRepoValidation}
                       error={errors.githubUrl?.message}
-                      disabled={isSubmitting}
+                      disabled={isDisabled}
                     />
                   </FormControl>
                   <FormMessage />
@@ -278,18 +282,18 @@ export const SubmitForm = () => {
               render={() => (
                 <FormItem>
                   <FormLabel className="font-serif text-xs uppercase">
-                    Post-Install Commands
+                    <span>Post-Install Commands</span>
                   </FormLabel>
                   <FormControl>
                     <div className="space-y-3">
-                      <InputGroup className="overflow-hidden rounded-xl md:h-12 md:px-1">
+                      <InputGroup className="overflow-hidden rounded-xl md:h-12 md:pr-0.5">
                         <InputGroupAddon>
-                          <Icon.ComputerTerminalIcon className="h-4 w-4" />
+                          <Icons.CodeSimpleIcon className="h-4 w-4" />
                         </InputGroupAddon>
                         <InputGroupInput
                           placeholder="e.g., npm run dev"
                           value={afterInput}
-                          disabled={isSubmitting}
+                          disabled={isDisabled}
                           onChange={(e) => setAfterInput(e.target.value)}
                           onKeyDown={(e) => handleKeyDown(e, "command")}
                         />
@@ -299,9 +303,9 @@ export const SubmitForm = () => {
                             variant="ghost"
                             size="sm"
                             onClick={handleAddCommand}
-                            disabled={isSubmitting}
+                            disabled={isDisabled}
                           >
-                            <Icon.AddIcon className="h-4 w-4" />
+                            <Icons.AddIcon className="h-4 w-4" />
                           </InputGroupButton>
                         </InputGroupAddon>
                       </InputGroup>
@@ -324,9 +328,9 @@ export const SubmitForm = () => {
                               <button
                                 type="button"
                                 onClick={() => handleRemoveCommand(cmd)}
-                                className="hover:text-destructive rounded-lg p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                                className="hover:text-destructive rounded-lg p-1"
                               >
-                                <Icon.Cancel01Icon className="h-3 w-3" />
+                                <Icons.Cancel01Icon className="h-3 w-3" />
                               </button>
                             </div>
                           ))}
@@ -348,18 +352,19 @@ export const SubmitForm = () => {
               render={() => (
                 <FormItem>
                   <FormLabel className="font-serif text-xs uppercase">
-                    Tech Stack Tags
+                    <span>Tech Stack Tags</span>
+                    <span className="text-destructive -mt-2 -ml-1">*</span>
                   </FormLabel>
                   <FormControl>
                     <div className="space-y-3">
-                      <InputGroup className="overflow-hidden rounded-xl md:h-12 md:px-1">
+                      <InputGroup className="overflow-hidden rounded-xl md:h-12 md:pr-0.5">
                         <InputGroupAddon>
-                          <Icon.Tag01Icon className="h-4 w-4" />
+                          <Icons.TagsIcon className="h-4 w-4" />
                         </InputGroupAddon>
                         <InputGroupInput
                           placeholder="e.g., Next.js, TypeScript"
                           value={stackInput}
-                          disabled={isSubmitting}
+                          disabled={isDisabled}
                           onChange={(e) => setStackInput(e.target.value)}
                           onKeyDown={(e) => handleKeyDown(e, "tag")}
                         />
@@ -369,9 +374,9 @@ export const SubmitForm = () => {
                             variant="ghost"
                             size="sm"
                             onClick={handleAddTag}
-                            disabled={stack.length >= 6 || isSubmitting}
+                            disabled={stack.length >= 6 || isDisabled}
                           >
-                            <Icon.AddIcon className="h-4 w-4" />
+                            <Icons.AddIcon className="h-4 w-4" />
                           </InputGroupButton>
                         </InputGroupAddon>
                       </InputGroup>
@@ -390,7 +395,7 @@ export const SubmitForm = () => {
                                 onClick={() => handleRemoveTag(tag)}
                                 className="hover:text-destructive rounded-full p-0.5"
                               >
-                                <Icon.Cancel01Icon className="h-3 w-3" />
+                                <Icons.Cancel01Icon className="h-3 w-3" />
                               </button>
                             </Badge>
                           ))}
@@ -413,14 +418,15 @@ export const SubmitForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-serif text-xs uppercase">
-                    Description
+                    <span>Description</span>
+                    <span className="text-destructive -mt-2 -ml-1">*</span>
                   </FormLabel>
                   <FormControl>
                     <InputGroup className="overflow-hidden rounded-xl md:px-1">
                       <InputGroupTextarea
                         placeholder="Briefly describe what this template includes and who it's for..."
                         rows={4}
-                        disabled={isSubmitting}
+                        disabled={isDisabled}
                         className="resize-none rounded-xl"
                         {...field}
                       />
@@ -439,7 +445,7 @@ export const SubmitForm = () => {
               type="submit"
               size="lg"
               className="h-12 w-full gap-2 rounded-full"
-              disabled={isSubmitting}
+              disabled={isDisabled}
             >
               Submit for Review
             </Button>

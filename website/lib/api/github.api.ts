@@ -1,5 +1,3 @@
-const GITHUB_USERNAME = "github";
-
 export interface GitHubRepo {
   id: number;
   name: string;
@@ -19,10 +17,10 @@ export interface RepoValidation {
   error?: string;
 }
 
-export async function fetchUserRepos(): Promise<GitHubRepo[]> {
+export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
   try {
     const response = await fetch(
-      `https://api.github.com/users/${GITHUB_USERNAME}/repos?type=public&sort=updated&per_page=100`,
+      `https://api.github.com/users/${username}/repos?type=public&sort=updated&per_page=500`,
     );
 
     if (!response.ok) {
@@ -89,7 +87,40 @@ export async function validateGitHubUrl(url: string): Promise<RepoValidation> {
     return {
       exists: false,
       isPrivate: false,
-      error: "Failed to validate repository",
+      error:
+        error instanceof Error
+          ? error.message
+          : "Failed to validate repository",
     };
+  }
+}
+
+/**
+ * Extract GitHub numeric user id from a typical GitHub avatar URL
+ * e.g. https://avatars.githubusercontent.com/u/1234567?v=4
+ */
+export function extractGithubIdFromAvatar(
+  imageUrl?: string | null,
+): string | null {
+  if (!imageUrl) return null;
+  const match = imageUrl.match(/\/u\/(\d+)/);
+  return match?.[1] ?? null;
+}
+
+/**
+ * Resolve GitHub login (username) from numeric user id using the undocumented
+ * GitHub API endpoint https://api.github.com/user/:id
+ * Returns the login or null if not found.
+ */
+export async function getGithubUsernameById(
+  id: string | number,
+): Promise<string | null> {
+  try {
+    const res = await fetch(`https://api.github.com/user/${id}`);
+    if (!res.ok) return null;
+    const data = (await res.json()) as { login?: string };
+    return data.login ?? null;
+  } catch {
+    return null;
   }
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import Provider from "./provider";
 import { fontVariables } from "@/font";
 import { siteConfig } from "@/config/site.config";
 
@@ -46,15 +45,11 @@ export const metadata: Metadata = {
   icons: "/logo.svg",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout(props: Readonly<React.PropsWithChildren>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={fontVariables("flex min-h-dvh flex-col antialiased")}>
-        <Provider>{children}</Provider>
+        {props.children}
       </body>
     </html>
   );

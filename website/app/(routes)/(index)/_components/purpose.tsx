@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { Card, CardContent } from "@/ui/card";
 import { Wrapper } from "@/components/wrapper";
-import { Icon } from "@/components/hugeicons";
+import { Icons } from "hugeicons-proxy";
 
 export const WhySpawnkit = () => {
   return (
@@ -180,7 +180,10 @@ export const WhySpawnkit = () => {
               <CardContent className="grid pt-6 sm:grid-cols-2">
                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
                   <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
-                    <Icon.LayerIcon className="m-auto size-5" strokeWidth={1} />
+                    <Icons.LayerIcon
+                      className="m-auto size-5"
+                      strokeWidth={1}
+                    />
                   </div>
                   <div className="space-y-2">
                     <h2 className="group-hover:text-secondary-950 text-lg font-medium text-zinc-800 transition dark:text-white">
@@ -192,8 +195,8 @@ export const WhySpawnkit = () => {
                     </p>
                   </div>
                 </div>
-                <div className="rounded-tl-(--radius) relative -mb-6 -mr-6 mt-6 h-fit border-l border-t p-6 py-6 sm:ml-6">
-                  <div className="absolute left-3 top-2 flex gap-1">
+                <div className="relative mt-6 -mr-6 -mb-6 h-fit rounded-tl-(--radius) border-t border-l p-6 py-6 sm:ml-6">
+                  <div className="absolute top-2 left-3 flex gap-1">
                     <span className="block size-2 rounded-full border dark:border-white/10 dark:bg-white/10"></span>
                     <span className="block size-2 rounded-full border dark:border-white/10 dark:bg-white/10"></span>
                     <span className="block size-2 rounded-full border dark:border-white/10 dark:bg-white/10"></span>
@@ -245,7 +248,7 @@ export const WhySpawnkit = () => {
               <CardContent className="grid h-full pt-6 sm:grid-cols-2">
                 <div className="relative z-10 flex flex-col justify-between space-y-12 lg:space-y-6">
                   <div className="relative flex aspect-square size-12 rounded-full border before:absolute before:-inset-2 before:rounded-full before:border dark:border-white/10 dark:before:border-white/5">
-                    <Icon.UserIcon className="m-auto size-6" strokeWidth={1} />
+                    <Icons.UserIcon className="m-auto size-6" strokeWidth={1} />
                   </div>
                   <div className="space-y-2">
                     <h2 className="text-lg font-medium transition">
@@ -257,7 +260,7 @@ export const WhySpawnkit = () => {
                     </p>
                   </div>
                 </div>
-                <div className="before:bg-(--color-border) relative mt-6 before:absolute before:inset-0 before:mx-auto before:w-px sm:-my-6 sm:-mr-6">
+                <div className="relative mt-6 before:absolute before:inset-0 before:mx-auto before:w-px before:bg-(--color-border) sm:-my-6 sm:-mr-6">
                   <div className="relative flex h-full flex-col justify-center space-y-6 py-6">
                     <div className="relative flex w-[calc(50%+0.875rem)] items-center justify-end gap-2">
                       <span className="block h-fit rounded border px-2 py-1 text-xs shadow-sm">

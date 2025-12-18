@@ -18,7 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import { Button, buttonVariants } from "@/ui/button";
 import { useCopyToClipboard } from "@/hooks/copyToClipboard";
 import { cn } from "@/lib/utils";
-import { Icon } from "./hugeicons";
+import { Icons } from "hugeicons-proxy";
 import { Kit } from "@/lib/kits";
 import Link from "next/link";
 
@@ -81,8 +81,12 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
           </div>
 
           <div className="border-t pt-4">
-            <Button size={"sm"} variant={"outline"}>
-              <span>35</span>
+            <Button
+              size={"sm"}
+              variant={"outline"}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <span>{kit.votes}</span>
               <span>Upvote</span>
             </Button>
           </div>
@@ -141,7 +145,7 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
             <pre className="bg-background dark:bg-card flex items-center gap-2 rounded-lg p-4 font-sans text-sm leading-relaxed font-medium whitespace-pre-wrap">
               {kit.stars !== undefined && (
                 <div className="flex items-center gap-1.5">
-                  <Icon.StarIcon className="size-4" />
+                  <Icons.StarIcon className="size-4" />
                   <span className="font-serif text-xs">
                     {kit.stars?.toLocaleString()} Stars
                   </span>
@@ -149,7 +153,7 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
               )}
               {kit.forks !== undefined && (
                 <div className="flex items-center gap-1.5">
-                  <Icon.GitForkIcon className="size-4" />
+                  <Icons.GitForkIcon className="size-4" />
                   <span className="font-serif text-xs">
                     {kit.stars?.toLocaleString()} Fork
                   </span>
@@ -162,7 +166,7 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
                 </div>
               )} */}
               <div className="ml-auto flex items-center gap-1.5">
-                <Icon.ArrowUp02Icon className="size-4" />
+                <Icons.ArrowUp02Icon className="size-4" />
                 <span className="font-serif text-xs">10 Votes</span>
               </div>
             </pre>
@@ -212,7 +216,7 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
                 size: "lg",
               })}
             >
-              <Icon.GithubIcon />
+              <Icons.GithubIcon />
               <span>View Repository</span>
             </Link>
           </DialogClose>

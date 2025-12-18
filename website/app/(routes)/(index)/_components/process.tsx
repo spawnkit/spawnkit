@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Wrapper } from "@/components/wrapper";
 import { FEATURES } from "@/constants";
+import { siteConfig } from "@/config/site.config";
 
 export const HowItWorks = () => {
   return (
@@ -8,12 +9,9 @@ export const HowItWorks = () => {
       <Wrapper size="sm" className="space-y-4 sm:space-y-8 md:space-y-12">
         <div className="relative z-10 grid items-center gap-4 md:grid-cols-2 md:gap-12">
           <h2 className="max-w-sm font-mono text-2xl font-semibold capitalize sm:text-3xl md:max-w-max md:text-4xl md:leading-12">
-            The Lyra ecosystem brings together our models
+            How {siteConfig.title} Works
           </h2>
-          <p className="max-w-sm text-base sm:ml-auto">
-            Empower your team with workflows that adapt to your needs, whether
-            you prefer git synchronization or a AI Agents interface.
-          </p>
+          <p className="max-w-sm text-base sm:ml-auto"></p>
         </div>
         <div className="px-3 pt-3 md:-mx-8 lg:-mx-10">
           <div className="relative aspect-88/36 mask-b-from-75% mask-b-to-95%">

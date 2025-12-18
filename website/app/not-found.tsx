@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { buttonVariants } from "@/ui/button";
-import { Icon } from "@/components/hugeicons";
+import { Icons } from "hugeicons-proxy";
 
 export default function NotFound() {
   return (
@@ -17,14 +17,14 @@ export default function NotFound() {
         </p>
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
           <Link href="/" className={buttonVariants()}>
-            <Icon.Home01Icon className="h-4 w-4" />
+            <Icons.Home01Icon className="h-4 w-4" />
             <span>Back to Home</span>
           </Link>
           <Link
             href="/community"
             className={buttonVariants({ variant: "outline" })}
           >
-            <Icon.ArrowLeft02Icon className="h-4 w-4" />
+            <Icons.ArrowLeft02Icon className="h-4 w-4" />
             <span>Browse Kits</span>
           </Link>
         </div>

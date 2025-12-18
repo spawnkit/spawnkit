@@ -1,4 +1,4 @@
-import { Icon } from "@/components/hugeicons";
+import { Icons } from "hugeicons-proxy";
 
 export const INIT_COMMAND = "npx spawnkit@latest init";
 
@@ -9,34 +9,34 @@ export const NAVIGATION_ROUTES = [
   {
     label: "GitHub",
     path: "https://github.com/spawnkit",
-    icon: Icon.GithubIcon,
+    icon: Icons.GithubIcon,
   },
 ];
 
 export const FEATURES = [
   {
-    icon: Icon.ComputerTerminal01Icon,
+    icon: Icons.ComputerTerminal01Icon,
     step: "01",
     title: "Run the CLI",
     description:
       "Execute npx spawnkit in your terminal to start the interactive wizard.",
   },
   {
-    icon: Icon.Select01Icon,
+    icon: Icons.Select01Icon,
     step: "02",
     title: "Choose your style",
     description:
       "Select your preferred language output and configuration options.",
   },
   {
-    icon: Icon.LayoutGridIcon,
+    icon: Icons.LayoutGridIcon,
     step: "03",
     title: "Pick a template",
     description:
       "Browse community-voted, verified starter templates for your stack.",
   },
   {
-    icon: Icon.Rocket01Icon,
+    icon: Icons.Rocket01Icon,
     step: "04",
     title: "Start building",
     description: "Your project is ready. No configuration needed—just code.",

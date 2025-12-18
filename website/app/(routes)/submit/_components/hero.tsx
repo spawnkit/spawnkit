@@ -1,4 +1,4 @@
-import { Icon } from "@/components/hugeicons";
+import { Icons } from "hugeicons-proxy";
 import { Wrapper } from "@/components/wrapper";
 import { Card, CardContent } from "@/ui/card";
 import React from "react";
@@ -28,7 +28,7 @@ export const HeroComp = () => {
           <CardContent>
             <div className="flex flex-col items-start gap-4 sm:flex-row">
               <div className="bg-primary/10 rounded-xl p-2">
-                <Icon.AlertSquareIcon className="text-primary h-5 w-5" />
+                <Icons.AlertSquareIcon className="text-primary h-5 w-5" />
               </div>
               <div className="text-sm">
                 <p className="mb-3 font-serif text-[11px] font-normal uppercase sm:text-xs">

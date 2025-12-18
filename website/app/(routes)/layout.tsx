@@ -1,4 +1,3 @@
-"use client";
 import NextJSTopLoader from "nextjs-toploader";
 
 import { Toaster } from "@/ui/sonner";
@@ -6,7 +5,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ThemeProvider } from "@/components/provider/theme.provider";
 
-export default function Provider(props: { children: React.ReactNode }) {
+export default function RootLayout(props: Readonly<React.PropsWithChildren>) {
   return (
     <ThemeProvider
       attribute="class"

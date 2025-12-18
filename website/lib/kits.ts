@@ -29,8 +29,8 @@ export const initialKits: Kit[] = [
     stars: 342,
     forks: 89,
     language: "TypeScript",
-    owner: "example",
-    ownerAvatar: "https://github.com/ghost.png",
+    owner: "thelastofinusa",
+    ownerAvatar: "https://github.com/thelastofinusa.png",
   },
   {
     id: "2",

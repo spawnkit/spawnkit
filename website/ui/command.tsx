@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/ui/dialog";
-import { Icon } from "@/components/hugeicons";
+import { Icons } from "hugeicons-proxy";
 
 function Command({
   className,
@@ -69,7 +69,7 @@ function CommandInput({
       data-slot="command-input-wrapper"
       className="flex h-auto items-center gap-2 border-b px-3"
     >
-      <Icon.Search01Icon className="size-4 shrink-0 opacity-50" />
+      <Icons.Search01Icon className="size-4 shrink-0 opacity-50" />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(

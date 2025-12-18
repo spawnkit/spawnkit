@@ -22,3 +22,10 @@ export function generatePreset(title: string): string {
 export async function sleep(duration = 1500): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, duration));
 }
+
+export function assertValue<T>(value: T, errorMessage: string): T {
+  if (value === undefined || value === null) {
+    throw new Error(errorMessage);
+  }
+  return value;
+}

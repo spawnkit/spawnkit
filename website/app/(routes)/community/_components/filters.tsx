@@ -5,7 +5,7 @@ import React from "react";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/ui/input-group";
 import { Card } from "@/ui/card";
 import { Wrapper } from "@/components/wrapper";
-import { Icon } from "@/components/hugeicons";
+import { Icons } from "hugeicons-proxy";
 import { Button } from "@/ui/button";
 import { FilterStatus } from "@/lib/types";
 import { KitCard } from "@/components/kit-card";
@@ -42,7 +42,7 @@ export const Filters = () => {
         <Card className="flex flex-row flex-wrap items-center gap-2 p-4">
           <InputGroup className="mb-2 sm:mr-4 sm:mb-0 sm:max-w-sm">
             <InputGroupAddon className="text-muted-foreground">
-              <Icon.SearchAreaIcon className="text-muted-foreground size-5" />
+              <Icons.SearchAreaIcon className="text-muted-foreground size-5" />
             </InputGroupAddon>
             <InputGroupInput
               placeholder="Search templates, stacks.."
@@ -50,7 +50,7 @@ export const Filters = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <InputGroupAddon align="inline-end">
-              <Icon.FilterIcon className="size-5" />
+              <Icons.FilterIcon className="size-5" />
             </InputGroupAddon>
           </InputGroup>
 
@@ -65,7 +65,9 @@ export const Filters = () => {
               >
                 <span className="text-xs sm:text-sm">{status}</span>
                 {status !== "all" && (
-                  <span className="font-serif text-xs opacity-60">(0)</span>
+                  <span className="font-serif text-xs opacity-60">
+                    ({kits.filter((k) => k.status === status).length})
+                  </span>
                 )}
               </Button>
             ),
@@ -75,7 +77,11 @@ export const Filters = () => {
         {/* Results count */}
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing <span className="text-foreground font-medium">32</span> kits
+            Showing{" "}
+            <span className="text-foreground font-medium">
+              {filteredKits.length}
+            </span>{" "}
+            kits
           </p>
         </div>
 
@@ -89,7 +95,7 @@ export const Filters = () => {
         ) : (
           <div className="border-border bg-card/30 rounded-lg border border-dashed py-20 text-center">
             <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-              <Icon.SearchIcon className="text-muted-foreground h-8 w-8" />
+              <Icons.SearchIcon className="text-muted-foreground h-8 w-8" />
             </div>
             <p className="text-muted-foreground mb-4">
               No kits found matching your criteria.

@@ -4,7 +4,7 @@ import * as React from "react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/ui/button";
-import { Icon } from "./hugeicons";
+import { Icons } from "hugeicons-proxy";
 
 export function ModeSwitcher() {
   const { setTheme, resolvedTheme, theme } = useTheme();
@@ -13,7 +13,7 @@ export function ModeSwitcher() {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
   }, [resolvedTheme, setTheme]);
 
-  const ThemeIcon = theme === "dark" ? Icon.Sun02Icon : Icon.MoonCloudIcon;
+  const ThemeIcon = theme === "dark" ? Icons.Sun02Icon : Icons.MoonCloudIcon;
 
   return (
     <Button
