@@ -235,14 +235,16 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
                   isCopied && "bg-primary text-background",
                 )}
               >
-                npx spawnkit {kit.preset}
+                spawn {kit.preset}
               </span>
 
               <Button
                 size="icon-sm"
                 variant={"ghost"}
                 onClick={async () =>
-                  await copyToClipboard(`npx spawnkit ${kit.preset}`)
+                  await copyToClipboard(
+                    `npx spawnkit@latest init ${kit.preset}`,
+                  )
                 }
                 aria-label="Copy command"
                 className="-mr-1 ml-auto"
