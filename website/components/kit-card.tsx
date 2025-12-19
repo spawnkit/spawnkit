@@ -28,8 +28,8 @@ interface Props {
 }
 
 const statusStyles = {
-  pending: "bg-chart-4/10 text-chart-4 border-chart-4/20",
-  approved: "bg-primary/10 text-primary border-primary/20",
+  pending: "bg-yellow-600/10 text-yellow-600 border-yellow-600/20",
+  approved: "bg-green-600/10 text-green-600 border-green-600/20",
   rejected: "bg-destructive/10 text-destructive border-destructive/20",
 };
 
@@ -99,27 +99,30 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Card className="bg-card/50 hover:border-primary/50 hover:bg-card hover:glow-primary relative mb-6 h-max cursor-pointer break-inside-avoid gap-4 p-4 backdrop-blur-sm transition-all duration-300">
-          <div className="flex items-center gap-3">
-            <Avatar className="size-11 border">
-              <AvatarFallback>CN</AvatarFallback>
-              <AvatarImage
-                src={kit.owner?.avatarUrl ?? "https://github.com/ghost.png"}
-              />
-            </Avatar>
+        <Card className="bg-card dark:bg-card/50 hover:border-primary/50 hover:bg-card hover:glow-primary relative mb-6 h-max cursor-pointer break-inside-avoid gap-4 p-4 backdrop-blur-sm transition-all duration-300">
+          <div className="flex items-start gap-4">
+            <div className="flex flex-1 items-center gap-2">
+              <Avatar className="size-10 border">
+                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage
+                  src={kit.owner?.avatarUrl ?? "https://github.com/ghost.png"}
+                />
+              </Avatar>
 
-            <div className="flex flex-1 flex-col">
-              <p className="line-clamp-1 text-sm font-medium">{kit.name}</p>
-              {kit.owner && (
-                <span className="text-muted-foreground text-xs font-normal">
-                  by {kit.owner?.username}
-                </span>
-              )}
+              <div className="flex flex-1 flex-col">
+                <p className="line-clamp-1 text-sm font-medium">{kit.name}</p>
+                {kit.owner && (
+                  <span className="text-muted-foreground text-xs font-normal">
+                    by {kit.owner?.username}
+                  </span>
+                )}
+              </div>
             </div>
 
             <Badge
               variant={"secondary"}
               className={cn(
+                "mt-1 capitalize",
                 statusStyles[kit.status as keyof typeof statusStyles],
               )}
             >
@@ -127,7 +130,7 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
             </Badge>
           </div>
 
-          <pre className="text-foreground bg-card dark:bg-background rounded-lg p-4 font-sans text-sm leading-relaxed whitespace-pre-wrap">
+          <pre className="text-foreground bg-background rounded-lg p-4 font-sans text-sm leading-relaxed whitespace-pre-wrap">
             {kit.description}
           </pre>
 
@@ -149,8 +152,8 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div className="flex items-center gap-3">
-            <Avatar className="size-11 border">
+          <div className="flex items-center gap-2">
+            <Avatar className="size-10 border">
               <AvatarFallback>CN</AvatarFallback>
               <AvatarImage
                 src={kit.owner?.avatarUrl ?? "https://github.com/ghost.png"}
@@ -158,22 +161,22 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
             </Avatar>
 
             <div className="flex flex-1 flex-col gap-px">
-              <DialogTitle className="line-clamp-1 text-sm font-medium">
+              <DialogTitle className="text-sm font-medium">
                 {kit.name}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-xs font-normal">
-                by {kit.owner?.username}
+                by {kit.owner?.username}{" "}
+                <Badge
+                  variant={"secondary"}
+                  className={cn(
+                    "ml-2 px-1.5 py-px text-[10px] font-medium capitalize",
+                    statusStyles[kit.status as keyof typeof statusStyles],
+                  )}
+                >
+                  {kit.status}
+                </Badge>
               </DialogDescription>
             </div>
-
-            <Badge
-              variant={"secondary"}
-              className={cn(
-                statusStyles[kit.status as keyof typeof statusStyles],
-              )}
-            >
-              {kit.status}
-            </Badge>
           </div>
         </DialogHeader>
         <div className="flex flex-col gap-4">

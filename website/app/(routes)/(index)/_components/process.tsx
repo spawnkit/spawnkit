@@ -17,14 +17,14 @@ export const HowItWorks = () => {
           <div className="relative aspect-88/36 mask-b-from-75% mask-b-to-95%">
             <div className="ring-background bg-background relative overflow-hidden rounded-2xl border p-4 shadow-lg ring-1 inset-shadow-2xs shadow-zinc-950/15 sm:rounded-3xl md:rounded-4xl dark:inset-shadow-white/20">
               <Image
-                src="/dark.png"
+                src="/hiw-dark.gif"
                 className="bg-background relative hidden rounded-lg sm:rounded-xl md:rounded-2xl dark:block"
                 alt="payments illustration dark"
                 width={2797}
                 height={1137}
               />
               <Image
-                src="/light.png"
+                src="/hiw-dark.gif"
                 className="border-border/25 relative z-2 rounded-lg border sm:rounded-xl md:rounded-2xl dark:hidden"
                 alt="payments illustration light"
                 width={2797}
