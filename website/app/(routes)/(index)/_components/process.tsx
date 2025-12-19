@@ -22,13 +22,15 @@ export const HowItWorks = () => {
                 alt="payments illustration dark"
                 width={2797}
                 height={1137}
+                unoptimized
               />
               <Image
-                src="/hiw-dark.gif"
+                src="/hiw-light.gif"
                 className="border-border/25 relative z-2 rounded-lg border sm:rounded-xl md:rounded-2xl dark:hidden"
                 alt="payments illustration light"
                 width={2797}
                 height={1137}
+                unoptimized
               />
             </div>
           </div>
