@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import * as React from "react";
 import { toast } from "sonner";
 import { Icons } from "hugeicons-proxy";
@@ -9,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@/ui/button";
-import { Badge } from "@/ui/badge";
 import {
   Form,
   FormControl,
@@ -26,50 +24,24 @@ import {
   InputGroupInput,
   InputGroupTextarea,
 } from "@/ui/input-group";
-import { AFTER_COMMANDS } from "@/constants";
-import { generatePreset, sleep } from "@/lib/utils";
+import { generatePreset } from "@/lib/utils";
 import { RepoValidation } from "@/lib/api/github.api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import { RepoSelector } from "./repo-selector";
-import { addKit } from "@/lib/kits";
-import { authClient } from "@/lib/auth-client";
-
-const kitSchema = z.object({
-  name: z
-    .string()
-    .min(3, "Title must be at least 3 characters")
-    .max(50, "Title must be less than 50 characters"),
-  preset: z
-    .string()
-    .min(3, "Preset must be at least 3 characters")
-    .max(50, "Preset must be less than 50 characters")
-    .regex(/^[a-z0-9-]+$/, "Preset must be lowercase with hyphens only"),
-  githubUrl: z
-    .string("Repo URL is required")
-    .refine((url) => url.includes("github.com"), "Must be a GitHub URL"),
-  after: z.array(z.string()).optional(),
-  description: z
-    .string()
-    .min(20, "Description must be at least 20 characters")
-    .max(200, "Description must be less than 200 characters"),
-  stack: z.array(z.string()).min(1, "Add at least one tech stack tag"),
-});
-
-type KitFormData = z.infer<typeof kitSchema>;
+import { useUserStore } from "@/lib/stores/user-store";
+import { KitFormData, kitSchema } from "@/lib/validators";
 
 export const SubmitForm = () => {
+  const uuid = React.useId();
   const router = useRouter();
 
-  const [stack, setStack] = React.useState<string[]>([]);
-  const [stackInput, setStackInput] = React.useState("");
-  const [afterCommands, setAfterCommands] =
-    React.useState<string[]>(AFTER_COMMANDS);
+  const [afterCommands, setAfterCommands] = React.useState<string[]>([]);
   const [afterInput, setAfterInput] = React.useState("");
   const [repoValidation, setRepoValidation] =
     React.useState<RepoValidation | null>(null);
 
-  const { data: session } = authClient.useSession();
-  const isAuthenticated = !!session;
+  const user = useUserStore((s) => s.user);
+  const isAuthenticated = !!user;
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => setMounted(true), []);
@@ -80,9 +52,8 @@ export const SubmitForm = () => {
       name: "",
       preset: "",
       githubUrl: "",
-      after: AFTER_COMMANDS,
       description: "",
-      stack: [],
+      after: [],
     },
   });
 
@@ -118,23 +89,6 @@ export const SubmitForm = () => {
     [form],
   );
 
-  const handleAddTag = () => {
-    const tag = stackInput.trim();
-    if (tag && !stack.includes(tag) && stack.length < 6) {
-      const newStack = [...stack, tag];
-      setStack(newStack);
-      form.setValue("stack", newStack);
-      setStackInput("");
-      form.clearErrors("stack");
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    const newStack = stack.filter((tag) => tag !== tagToRemove);
-    setStack(newStack);
-    form.setValue("stack", newStack);
-  };
-
   const handleAddCommand = () => {
     const cmd = afterInput.trim();
     if (cmd && !afterCommands.includes(cmd)) {
@@ -153,11 +107,10 @@ export const SubmitForm = () => {
     form.setValue("after", newCommands);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent, action: "tag" | "command") => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      if (action === "tag") handleAddTag();
-      else handleAddCommand();
+      handleAddCommand();
     }
   };
 
@@ -174,32 +127,49 @@ export const SubmitForm = () => {
       });
       return;
     }
-    await sleep();
-    addKit(values);
-    toast.success(`${values.name} submitted!`, {
-      description: "Your template is now pending review.",
-    });
 
-    form.reset();
-    setStack([]);
-    setAfterCommands([]);
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ values, user }),
+      });
 
-    router.push("/community");
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success(result.message || "Your template is now pending review.");
+        form.reset();
+        setAfterCommands([]);
+
+        router.push("/community");
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      const errMsg =
+        error instanceof Error ? error.message : "Failed to submit template";
+      toast.error("Submission failed", {
+        description: errMsg,
+      });
+    }
   }
 
   return (
-    <Card className="px-1.5 sm:px-4">
-      <CardHeader className="pt-1.5 sm:pt-4">
+    <Card className="px-1 sm:px-4">
+      <CardHeader className="pt-1 sm:pt-4">
         <CardTitle className="text-xl font-medium">Template Details</CardTitle>
       </CardHeader>
-      <CardContent className="pb-1.5 sm:pb-4">
+      <CardContent className="pb-1 sm:pb-4">
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={control}
               name="name"
               render={({ field }) => (
-                <FormItem>
+                <FormItem id={uuid}>
                   <FormLabel className="font-serif text-xs uppercase">
                     <span>Template Name</span>
                     <span className="text-destructive -mt-2 -ml-1">*</span>
@@ -225,7 +195,7 @@ export const SubmitForm = () => {
               control={control}
               name="preset"
               render={({ field }) => (
-                <FormItem>
+                <FormItem id={uuid}>
                   <FormLabel className="font-serif text-xs uppercase">
                     <span>Preset Slug</span>
                     <span className="text-destructive -mt-2 -ml-1">*</span>
@@ -257,7 +227,7 @@ export const SubmitForm = () => {
               control={control}
               name="githubUrl"
               render={({ field }) => (
-                <FormItem>
+                <FormItem id={uuid}>
                   <FormLabel className="font-serif text-xs uppercase">
                     <span>GitHub Repository URL</span>
                     <span className="text-destructive -mt-2 -ml-1">*</span>
@@ -280,7 +250,7 @@ export const SubmitForm = () => {
               control={control}
               name="after"
               render={() => (
-                <FormItem>
+                <FormItem id={uuid}>
                   <FormLabel className="font-serif text-xs uppercase">
                     <span>Post-Install Commands</span>
                   </FormLabel>
@@ -295,7 +265,7 @@ export const SubmitForm = () => {
                           value={afterInput}
                           disabled={isDisabled}
                           onChange={(e) => setAfterInput(e.target.value)}
-                          onKeyDown={(e) => handleKeyDown(e, "command")}
+                          onKeyDown={(e) => handleKeyDown(e)}
                         />
                         <InputGroupAddon align="inline-end">
                           <InputGroupButton
@@ -348,75 +318,9 @@ export const SubmitForm = () => {
 
             <FormField
               control={control}
-              name="stack"
-              render={() => (
-                <FormItem>
-                  <FormLabel className="font-serif text-xs uppercase">
-                    <span>Tech Stack Tags</span>
-                    <span className="text-destructive -mt-2 -ml-1">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <div className="space-y-3">
-                      <InputGroup className="overflow-hidden rounded-xl md:h-12 md:pr-0.5">
-                        <InputGroupAddon>
-                          <Icons.TagsIcon className="h-4 w-4" />
-                        </InputGroupAddon>
-                        <InputGroupInput
-                          placeholder="e.g., Next.js, TypeScript"
-                          value={stackInput}
-                          disabled={isDisabled}
-                          onChange={(e) => setStackInput(e.target.value)}
-                          onKeyDown={(e) => handleKeyDown(e, "tag")}
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleAddTag}
-                            disabled={stack.length >= 6 || isDisabled}
-                          >
-                            <Icons.AddIcon className="h-4 w-4" />
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </InputGroup>
-
-                      {stack.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {stack.map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="secondary"
-                              className="gap-1 rounded-full pr-1.5"
-                            >
-                              {tag}
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveTag(tag)}
-                                className="hover:text-destructive rounded-full p-0.5"
-                              >
-                                <Icons.Cancel01Icon className="h-3 w-3" />
-                              </button>
-                            </Badge>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </FormControl>
-
-                  <FormDescription className="flex-1">
-                    Add up to 6 tags. Press Enter to add.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={control}
               name="description"
               render={({ field }) => (
-                <FormItem>
+                <FormItem id={uuid}>
                   <FormLabel className="font-serif text-xs uppercase">
                     <span>Description</span>
                     <span className="text-destructive -mt-2 -ml-1">*</span>
@@ -446,6 +350,8 @@ export const SubmitForm = () => {
               size="lg"
               className="h-12 w-full gap-2 rounded-full"
               disabled={isDisabled}
+              isLoading={isSubmitting}
+              loadingText="Submitting for review..."
             >
               Submit for Review
             </Button>

@@ -82,5 +82,20 @@ export async function queryChoices(
     data = JSON.parse(fs.readFileSync(filePath, "utf-8")) as unknown[];
   }
 
-  return validateChoices(data);
+  const normalized = (data as any[]).map((item) => {
+    const out = { ...item };
+    if (out.after === null || out.after === undefined) {
+      delete out.after;
+    } else if (typeof out.after === "string") {
+      out.after = [out.after];
+    } else if (Array.isArray(out.after)) {
+      out.after = out.after.filter((x: unknown) => typeof x === "string");
+      if (out.after.length === 0) delete out.after;
+    } else {
+      delete out.after;
+    }
+    return out;
+  });
+
+  return validateChoices(normalized);
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { TbCopy, TbCopyCheckFilled, TbTerminal } from "react-icons/tb";
 
 import { Badge } from "@/ui/badge";
@@ -19,11 +20,11 @@ import { Button, buttonVariants } from "@/ui/button";
 import { useCopyToClipboard } from "@/hooks/copyToClipboard";
 import { cn } from "@/lib/utils";
 import { Icons } from "hugeicons-proxy";
-import { Kit } from "@/lib/kits";
 import Link from "next/link";
+import { QueryKitsResult } from "@/sanity.types";
 
 interface Props {
-  kit: Kit;
+  kit: QueryKitsResult[number];
 }
 
 const statusStyles = {
@@ -34,16 +35,76 @@ const statusStyles = {
 
 export const KitCard: React.FC<Props> = ({ kit }) => {
   const { isCopied, copyToClipboard } = useCopyToClipboard();
+  const [stars, setStars] = React.useState<number | null>(null);
+  const [forks, setForks] = React.useState<number | null>(null);
+  const [languages, setLanguages] = React.useState<string[]>([]);
+
+  const LANGUAGE_COLORS: Record<string, string> = {
+    TypeScript: "#3178c6",
+    JavaScript: "#f1e05a",
+    Solidity: "#363636",
+    Python: "#3572A5",
+    Go: "#00ADD8",
+    Rust: "#dea584",
+    "C++": "#f34b7d",
+    C: "#555555",
+    Java: "#b07219",
+    HTML: "#e34c26",
+    CSS: "#563d7c",
+    Shell: "#89e051",
+  };
+
+  const getLanguageColor = (lang: string): string =>
+    LANGUAGE_COLORS[lang] || "var(--secondary)";
+
+  React.useEffect(() => {
+    const loadRepoMeta = async () => {
+      try {
+        const match = kit.repo?.match(/github\.com\/([^/]+)\/([^/]+)/);
+        if (!match) return;
+        const [, owner, repo] = match;
+        const repoName = repo.replace(/\.git$/, "");
+
+        const [repoRes, langRes] = await Promise.all([
+          fetch(`https://api.github.com/repos/${owner}/${repoName}`, {
+            method: "GET",
+          }),
+          fetch(`https://api.github.com/repos/${owner}/${repoName}/languages`, {
+            method: "GET",
+          }),
+        ]);
+
+        if (repoRes.ok) {
+          const repoData = (await repoRes.json()) as {
+            stargazers_count?: number;
+            forks_count?: number;
+          };
+          setStars(repoData.stargazers_count ?? null);
+          setForks(repoData.forks_count ?? null);
+        }
+
+        if (langRes.ok) {
+          const langObj = (await langRes.json()) as Record<string, number>;
+          const langs = Object.keys(langObj);
+          setLanguages(langs);
+        }
+      } catch {
+        /* noop */
+      }
+    };
+
+    void loadRepoMeta();
+  }, [kit.repo]);
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Card className="bg-card/50 hover:border-primary/50 hover:bg-card hover:glow-primary relative cursor-pointer gap-4 p-4 backdrop-blur-sm transition-all duration-300">
+        <Card className="bg-card/50 hover:border-primary/50 hover:bg-card hover:glow-primary relative mb-6 h-max cursor-pointer break-inside-avoid gap-4 p-4 backdrop-blur-sm transition-all duration-300">
           <div className="flex items-center gap-3">
             <Avatar className="size-11 border">
               <AvatarFallback>CN</AvatarFallback>
               <AvatarImage
-                src={kit.ownerAvatar ?? "https://github.com/ghost.png"}
+                src={kit.owner?.avatarUrl ?? "https://github.com/ghost.png"}
               />
             </Avatar>
 
@@ -51,45 +112,39 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
               <p className="line-clamp-1 text-sm font-medium">{kit.name}</p>
               {kit.owner && (
                 <span className="text-muted-foreground text-xs font-normal">
-                  by {kit.owner}
+                  by {kit.owner?.username}
                 </span>
               )}
             </div>
 
             <Badge
               variant={"secondary"}
-              className={cn(statusStyles[kit.status])}
+              className={cn(
+                statusStyles[kit.status as keyof typeof statusStyles],
+              )}
             >
               {kit.status}
             </Badge>
           </div>
 
-          <pre className="text-muted-foreground rounded-lg font-sans text-sm leading-relaxed whitespace-pre-wrap">
+          <pre className="text-foreground bg-card dark:bg-background rounded-lg p-4 font-sans text-sm leading-relaxed whitespace-pre-wrap">
             {kit.description}
           </pre>
 
-          {/* Tech Stack */}
-          <div className="flex flex-wrap gap-2">
-            {kit.stack.map((stack) => (
-              <span
-                key={stack}
-                className="bg-secondary text-secondary-foreground border-border/50 rounded-full border px-3 py-1 text-xs font-medium"
-              >
-                {stack}
-              </span>
-            ))}
-          </div>
-
-          <div className="border-t pt-4">
-            <Button
-              size={"sm"}
-              variant={"outline"}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <span>{kit.votes}</span>
-              <span>Upvote</span>
-            </Button>
-          </div>
+          {/* Languages */}
+          {languages.length > 0 && (
+            <div className="flex flex-wrap gap-3">
+              {languages.map((lang) => (
+                <div key={lang} className="flex items-center gap-1.5">
+                  <span
+                    className="bg-secondary size-3 rounded-full border"
+                    style={{ backgroundColor: getLanguageColor(lang) }}
+                  />
+                  <p className="text-xs font-medium">{lang}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -98,7 +153,7 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
             <Avatar className="size-11 border">
               <AvatarFallback>CN</AvatarFallback>
               <AvatarImage
-                src={kit.ownerAvatar ?? "https://github.com/ghost.png"}
+                src={kit.owner?.avatarUrl ?? "https://github.com/ghost.png"}
               />
             </Avatar>
 
@@ -107,13 +162,15 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
                 {kit.name}
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-xs font-normal">
-                by {kit.owner}
+                by {kit.owner?.username}
               </DialogDescription>
             </div>
 
             <Badge
               variant={"secondary"}
-              className={cn(statusStyles[kit.status])}
+              className={cn(
+                statusStyles[kit.status as keyof typeof statusStyles],
+              )}
             >
               {kit.status}
             </Badge>
@@ -125,49 +182,42 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
           </pre>
 
           <div className="flex flex-col gap-2">
-            <p className="font-serif text-[11px] font-normal uppercase sm:text-xs">
-              Tech Stacks
-            </p>
-
-            <div className="flex flex-wrap gap-2">
-              {kit.stack.map((stack) => (
-                <span
-                  key={stack}
-                  className="bg-secondary text-secondary-foreground border-border/50 rounded-full border px-3 py-1 text-xs font-medium"
-                >
-                  {stack}
-                </span>
-              ))}
+            <div className="flex flex-wrap gap-3">
+              {languages.length > 0 ? (
+                languages.map((lang) => (
+                  <div key={lang} className="flex items-center gap-1.5">
+                    <span
+                      className="bg-secondary size-3 rounded-full border"
+                      style={{ backgroundColor: getLanguageColor(lang) }}
+                    />
+                    <p className="text-xs font-medium">{lang}</p>
+                  </div>
+                ))
+              ) : (
+                <span className="text-muted-foreground text-sm">—</span>
+              )}
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <pre className="bg-background dark:bg-card flex items-center gap-2 rounded-lg p-4 font-sans text-sm leading-relaxed font-medium whitespace-pre-wrap">
-              {kit.stars !== undefined && (
-                <div className="flex items-center gap-1.5">
-                  <Icons.StarIcon className="size-4" />
-                  <span className="font-serif text-xs">
-                    {kit.stars?.toLocaleString()} Stars
-                  </span>
-                </div>
-              )}
-              {kit.forks !== undefined && (
-                <div className="flex items-center gap-1.5">
-                  <Icons.GitForkIcon className="size-4" />
-                  <span className="font-serif text-xs">
-                    {kit.stars?.toLocaleString()} Fork
-                  </span>
-                </div>
-              )}
-              {/* {kit.language && (
-                <div className="flex items-center gap-1.5">
-                  <span className="bg-primary h-3 w-3 rounded-full" />
-                  <span className="text-muted-foreground">{kit.language}</span>
-                </div>
-              )} */}
+              <div className="flex items-center gap-1.5">
+                <Icons.StarIcon className="size-4" />
+                <span className="font-serif text-xs">
+                  {stars !== null ? `${stars} Stars` : "—"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <Icons.GitForkIcon className="size-4" />
+                <span className="font-serif text-xs">
+                  {forks !== null ? `${forks} Forks` : "—"}
+                </span>
+              </div>
+
               <div className="ml-auto flex items-center gap-1.5">
                 <Icons.ArrowUp02Icon className="size-4" />
-                <span className="font-serif text-xs">10 Votes</span>
+                <span className="font-serif text-xs">{kit.votes} Votes</span>
               </div>
             </pre>
           </div>
@@ -178,21 +228,21 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
             </p>
 
             <pre className="bg-background dark:bg-card flex items-center gap-2 rounded-lg px-4 py-2.5 font-sans text-sm leading-relaxed font-medium whitespace-pre-wrap">
-              <TbTerminal className="text-primary size-4.5" />
+              <TbTerminal className="text-primary size-4.5 shrink-0" />
               <span
                 className={cn(
                   "line-clamp-1 px-1",
                   isCopied && "bg-primary text-background",
                 )}
               >
-                npx spawnkit nextjs-starter
+                npx spawnkit {kit.preset}
               </span>
 
               <Button
                 size="icon-sm"
                 variant={"ghost"}
                 onClick={async () =>
-                  await copyToClipboard("npx spawnkit nextjs-starter")
+                  await copyToClipboard(`npx spawnkit ${kit.preset}`)
                 }
                 aria-label="Copy command"
                 className="-mr-1 ml-auto"
@@ -210,7 +260,7 @@ export const KitCard: React.FC<Props> = ({ kit }) => {
           <DialogClose asChild>
             <Link
               target="_blank"
-              href={{ pathname: kit.githubUrl }}
+              href={{ pathname: kit.repo }}
               className={buttonVariants({
                 className: "mx-auto h-12 w-[90%] rounded-full!",
                 size: "lg",

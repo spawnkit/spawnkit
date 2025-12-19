@@ -1,25 +1,24 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+import { Icons } from "hugeicons-proxy";
 
-import { InputGroup, InputGroupAddon, InputGroupInput } from "@/ui/input-group";
 import { Card } from "@/ui/card";
 import { Wrapper } from "@/components/wrapper";
-import { Icons } from "hugeicons-proxy";
 import { Button } from "@/ui/button";
 import { FilterStatus } from "@/lib/types";
 import { KitCard } from "@/components/kit-card";
-import { getKits, Kit } from "@/lib/kits";
-import Link from "next/link";
+import { InputGroup, InputGroupAddon, InputGroupInput } from "@/ui/input-group";
+import { QueryKitsResult } from "@/sanity.types";
 
-export const Filters = () => {
-  const [kits, setKits] = React.useState<Kit[]>([]);
+interface Props {
+  kits: QueryKitsResult;
+}
+
+export const Filters: React.FC<Props> = ({ kits }) => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [filterStatus, setFilterStatus] = React.useState<FilterStatus>("all");
-
-  React.useEffect(() => {
-    setKits(getKits());
-  }, []);
 
   const filteredKits = kits
     .filter((kit) => {
@@ -27,14 +26,13 @@ export const Filters = () => {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
-          kit.name.toLowerCase().includes(query) ||
-          kit.description.toLowerCase().includes(query) ||
-          kit.stack.some((tech) => tech.toLowerCase().includes(query))
+          kit.name?.toLowerCase().includes(query) ||
+          kit.description?.toLowerCase().includes(query)
         );
       }
       return true;
     })
-    .sort((a, b) => b.votes - a.votes);
+    .sort((a, b) => (b.votes ?? 0) - (a.votes ?? 0));
 
   return (
     <div className="flex-1 pb-16 sm:pb-24 md:pb-32">
@@ -87,15 +85,15 @@ export const Filters = () => {
 
         {/* Kits Grid */}
         {filteredKits.length > 0 ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="gap-6 sm:columns-2 lg:columns-3">
             {filteredKits.map((kit) => (
-              <KitCard key={kit.id} kit={kit} />
+              <KitCard key={kit._id} kit={kit} />
             ))}
           </div>
         ) : (
-          <div className="border-border bg-card/30 rounded-lg border border-dashed py-20 text-center">
+          <div className="border-border bg-card/30 rounded-2xl border border-dashed py-20 text-center">
             <div className="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-              <Icons.SearchIcon className="text-muted-foreground h-8 w-8" />
+              <Icons.PackageSearchIcon className="text-muted-foreground h-8 w-8" />
             </div>
             <p className="text-muted-foreground mb-4">
               No kits found matching your criteria.

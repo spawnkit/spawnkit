@@ -9,7 +9,7 @@ import { LogoComp } from "./logo";
 import { ModeSwitcher } from "./mode-switcher";
 import { NAVIGATION_ROUTES } from "@/constants";
 import { Button, buttonVariants } from "@/ui/button";
-import { cn, isActivePath } from "@/lib/utils";
+import { cn, getInitials, isActivePath } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 import { Icons } from "hugeicons-proxy";
 import { Separator } from "@/ui/separator";
@@ -41,13 +41,16 @@ import {
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
 import { authClient } from "@/lib/auth-client";
+import { useUserStore } from "@/lib/stores/user-store";
+import { toast } from "sonner";
 
 export const Header = () => {
   const pathname = usePathname();
 
   const [isMounted, setIsMounted] = React.useState(false);
   const [isSmall, setIsSmall] = React.useState(false);
-  const { data: session } = authClient.useSession();
+  const [isSigningIn, setIsSigningIn] = React.useState(false);
+  const user = useUserStore((s) => s.user);
 
   React.useEffect(() => {
     setIsMounted(true);
@@ -65,6 +68,37 @@ export const Header = () => {
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
+
+  async function handleSignIn() {
+    try {
+      setIsSigningIn(true);
+
+      await authClient.signIn.social({
+        /**
+         * The social provider ID
+         * @example "github", "google", "apple"
+         */
+        provider: "github",
+        /**
+         * A URL to redirect after the user authenticates with the provider
+         * @default "/"
+         */
+        callbackURL: pathname,
+        /**
+         * A URL to redirect if an error occurs during the sign in process
+         */
+        errorCallbackURL: "/",
+        /**
+         * A URL to redirect if the user is newly registered
+         */
+        newUserCallbackURL: pathname,
+      });
+    } catch (error) {
+      const errMsg =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      toast.error(errMsg);
+    }
+  }
 
   return (
     <header className="bg-background dark:bg-background/80 sticky top-0 left-0 z-50 backdrop-blur-lg sm:dark:bg-transparent sm:dark:backdrop-blur-none">
@@ -103,27 +137,35 @@ export const Header = () => {
               <React.Fragment>
                 <ModeSwitcher />
 
-                {session ? (
+                {user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Avatar className="cursor-pointer border">
                         <AvatarFallback>
-                          {session.user?.name?.slice(0, 2).toUpperCase() ||
-                            "GH"}
+                          {getInitials(user.name || "")}
                         </AvatarFallback>
-                        <AvatarImage src={session.user?.image || ""} />
+                        <AvatarImage src={user.avatar || ""} />
                       </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end">
                       <DropdownMenuLabel>
-                        {session.user?.name}
+                        {user.username ? `@${user.username}` : user.name}
                       </DropdownMenuLabel>
                       <DropdownMenuGroup>
                         <DropdownMenuItem>
                           Profile
                           <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>GitHub</DropdownMenuItem>
+                        {user.username && (
+                          <DropdownMenuItem asChild>
+                            <Link
+                              target="_blank"
+                              href={`https://github.com/${user.username}`}
+                            >
+                              GitHub
+                            </Link>
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => authClient.signOut()}>
@@ -184,30 +226,11 @@ export const Header = () => {
                       </div>
                       <Button
                         type="button"
-                        className="mt-4 w-full"
+                        className="mt-2 w-full rounded-full"
                         size="lg"
-                        onClick={() =>
-                          authClient.signIn.social({
-                            /**
-                             * The social provider ID
-                             * @example "github", "google", "apple"
-                             */
-                            provider: "github",
-                            /**
-                             * A URL to redirect after the user authenticates with the provider
-                             * @default "/"
-                             */
-                            callbackURL: "/community",
-                            /**
-                             * A URL to redirect if an error occurs during the sign in process
-                             */
-                            errorCallbackURL: "/",
-                            /**
-                             * A URL to redirect if the user is newly registered
-                             */
-                            newUserCallbackURL: "/submit",
-                          })
-                        }
+                        onClick={handleSignIn}
+                        isLoading={isSigningIn}
+                        loadingText="Authenticating..."
                       >
                         Continue with GitHub
                       </Button>

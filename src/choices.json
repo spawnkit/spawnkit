@@ -1,8 +1,0 @@
-[
-  {
-    "title": "Next.js & Shadcn UI Starter",
-    "preset": "nextjs-shadcn",
-    "repo": "https://github.com/spawnkit/nextjs-boilerplate",
-    "after": ["npm run dev"]
-  }
-]

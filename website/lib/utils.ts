@@ -29,3 +29,10 @@ export function assertValue<T>(value: T, errorMessage: string): T {
   }
   return value;
 }
+
+export function getInitials(value: string): string {
+  return value
+    .split(" ")
+    .map((word) => word[0])
+    .join("");
+}

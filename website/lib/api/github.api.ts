@@ -21,6 +21,7 @@ export async function fetchUserRepos(username: string): Promise<GitHubRepo[]> {
   try {
     const response = await fetch(
       `https://api.github.com/users/${username}/repos?type=public&sort=updated&per_page=500`,
+      { method: "GET" },
     );
 
     if (!response.ok) {
@@ -53,6 +54,7 @@ export async function validateGitHubUrl(url: string): Promise<RepoValidation> {
   try {
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repoName}`,
+      { method: "GET" },
     );
 
     if (response.status === 404) {
@@ -116,7 +118,9 @@ export async function getGithubUsernameById(
   id: string | number,
 ): Promise<string | null> {
   try {
-    const res = await fetch(`https://api.github.com/user/${id}`);
+    const res = await fetch(`https://api.github.com/user/${id}`, {
+      method: "GET",
+    });
     if (!res.ok) return null;
     const data = (await res.json()) as { login?: string };
     return data.login ?? null;

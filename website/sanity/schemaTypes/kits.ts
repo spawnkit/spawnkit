@@ -1,8 +1,8 @@
 import { defineField, defineType } from "sanity";
 import { Icons } from "hugeicons-proxy";
 
-export const kitsSchema = defineType({
-  name: "kits",
+export const kitSchema = defineType({
+  name: "kit",
   type: "document",
   title: "Template Kits",
   icon: Icons.GridIcon,
@@ -23,15 +23,9 @@ export const kitsSchema = defineType({
       title: "Template Preset (slug)",
       type: "slug",
       options: {
-        source: "title",
+        source: "name",
         maxLength: 96,
       },
-    }),
-    defineField({
-      name: "stack",
-      title: "Tech Stacks",
-      type: "array",
-      of: [{ type: "string" }],
     }),
     defineField({
       name: "repo",
@@ -67,7 +61,13 @@ export const kitsSchema = defineType({
       name: "owner",
       title: "Template Creator",
       type: "reference",
-      to: [{ type: "users" }],
+      to: [{ type: "user" }],
+    }),
+    defineField({
+      name: "commands",
+      title: "Post-Install commands",
+      type: "array",
+      of: [{ type: "string" }],
     }),
   ],
 });

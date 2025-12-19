@@ -13,8 +13,6 @@ import {
   GitHubRepo,
   RepoValidation,
   validateGitHubUrl,
-  getGithubUsernameById,
-  extractGithubIdFromAvatar,
 } from "@/lib/api/github.api";
 import { Icons } from "hugeicons-proxy";
 import {
@@ -28,7 +26,7 @@ import {
 import { Badge } from "@/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { useIsMobile } from "@/hooks/mobile";
-import { authClient } from "@/lib/auth-client";
+import { useUserStore } from "@/lib/stores/user-store";
 
 interface Props {
   value: string;
@@ -49,14 +47,15 @@ export const RepoSelector: React.FC<Props> = ({
 
   const [open, setOpen] = React.useState(false);
   const [repos, setRepos] = React.useState<GitHubRepo[]>([]);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   const [validating, setValidating] = React.useState(false);
   const [searchFilter, setSearchFilter] = React.useState<string>("");
   const [validation, setValidation] = React.useState<RepoValidation | null>(
     null,
   );
 
-  const { data: session } = authClient.useSession();
+  const user = useUserStore((s) => s.user);
+  const setUser = useUserStore((s) => s.setUser);
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => setMounted(true), []);
@@ -65,28 +64,12 @@ export const RepoSelector: React.FC<Props> = ({
     const loadRepos = async () => {
       setLoading(true);
       try {
-        if (!mounted) {
-          return;
-        }
-        if (!session) {
+        if (!mounted) return;
+        if (!user?.username) {
           setRepos([]);
           return;
         }
-
-        const id = extractGithubIdFromAvatar(session.user?.image);
-        if (!id) {
-          setRepos([]);
-          return;
-        }
-
-        const login = await getGithubUsernameById(id);
-
-        if (!login) {
-          setRepos([]);
-          return;
-        }
-
-        const userRepos = await fetchUserRepos(login);
+        const userRepos = await fetchUserRepos(user.username);
         setRepos(userRepos);
       } finally {
         setLoading(false);
@@ -94,7 +77,7 @@ export const RepoSelector: React.FC<Props> = ({
     };
 
     void loadRepos();
-  }, [session, mounted]);
+  }, [user?.username, mounted]);
 
   React.useEffect(() => {
     if (!value || !value.includes("github.com")) {
@@ -107,11 +90,17 @@ export const RepoSelector: React.FC<Props> = ({
       const result = await validateGitHubUrl(value);
       setValidation(result);
       onValidation(result);
+      if (result?.exists && result.repo?.full_name) {
+        const owner = result.repo.full_name.split("/")[0] || undefined;
+        if (owner && user) {
+          setUser({ ...user, username: owner });
+        }
+      }
       setValidating(false);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [value, onValidation]);
+  }, [value, onValidation, setUser, user]);
 
   const filteredRepos = repos.filter(
     (repo) =>
@@ -124,6 +113,8 @@ export const RepoSelector: React.FC<Props> = ({
     setOpen(false);
     setSearchFilter("");
   };
+
+  const canOpen = !disabled && (!!user?.username || true);
 
   const getValidationIcon = () => {
     if (validating)
@@ -144,24 +135,31 @@ export const RepoSelector: React.FC<Props> = ({
     <>
       <div className="inline-flex flex-col space-y-2">
         <InputGroup className="overflow-hidden rounded-xl md:h-12 md:px-0.5">
-          {!disabled && (
-            <InputGroupAddon>
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
-                  <InputGroupButton
-                    type="button"
-                    onClick={() => setOpen(!open)}
-                    disabled={disabled}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    {loading ? (
-                      <Icons.Loading03Icon className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Icons.GitBranchIcon className="h-4 w-4" />
-                    )}
-                  </InputGroupButton>
-                </PopoverTrigger>
+          <InputGroupAddon>
+            <Popover
+              open={open}
+              onOpenChange={(o) => setOpen(canOpen ? o : false)}
+            >
+              <PopoverTrigger asChild disabled={!canOpen}>
+                <InputGroupButton
+                  type="button"
+                  onClick={() => {
+                    if (!canOpen) return;
+                    setOpen(!open);
+                  }}
+                  variant="secondary"
+                  size="sm"
+                  disabled={!canOpen || loading}
+                >
+                  {loading ? (
+                    <Icons.Loading03Icon className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Icons.GitBranchIcon className="h-4 w-4" />
+                  )}
+                </InputGroupButton>
+              </PopoverTrigger>
+
+              {canOpen && (
                 <PopoverContent
                   className="ml-6 w-80 overflow-hidden rounded-xl p-0 md:ml-0 md:w-96"
                   align={isMobile ? "center" : "start"}
@@ -172,7 +170,7 @@ export const RepoSelector: React.FC<Props> = ({
                       value={searchFilter}
                       onValueChange={(e) => setSearchFilter(e)}
                       className="disabled:cursor-not-allowed"
-                      disabled={disabled}
+                      disabled={!canOpen}
                     />
                     <CommandList>
                       <CommandEmpty>No results found.</CommandEmpty>
@@ -215,9 +213,9 @@ export const RepoSelector: React.FC<Props> = ({
                     </CommandList>
                   </Command>
                 </PopoverContent>
-              </Popover>
-            </InputGroupAddon>
-          )}
+              )}
+            </Popover>
+          </InputGroupAddon>
           <div className="relative flex-1">
             <InputGroupInput
               placeholder="https://github.com/username/repo"
